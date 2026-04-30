@@ -1,0 +1,187 @@
+/* FUENTE: Inter es más moderna para interfaces oscuras */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+    /* PALETA ULTRA OSCURA Y NEÓN */
+    --bg-dark: #020617;          /* Azul casi negro profundo */
+    --bg-gradient-top: #0f172a; /* Azul medianoche oscuro */
+    --card-bg: rgba(30, 41, 59, 0.5); /* Azul pizarra muy translúcido */
+    --card-hover-bg: rgba(30, 41, 59, 0.8);
+    --accent-blue: #3b82f6;     /* Azul brillante Neón */
+    --text-primary: #f8fafc;    /* Blanco grisáceo */
+    --text-secondary: #94a3b8;  /* Gris azulado */
+    --border-color: rgba(255, 255, 255, 0.06); /* Borde casi invisible */
+    
+    /* Efecto de resplandor neón sutil */
+    --neon-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-primary);
+    /* ELIMINADA IMAGEN DE FONDO -> Usamos degradado profundo */
+    background: radial-gradient(circle at top right, var(--bg-gradient-top), var(--bg-dark));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ELIMINADO body::before (ya no se necesita el overlay) */
+
+/* NAVBAR MODERNA CON BLUR */
+.navbar {
+    background: rgba(2, 6, 23, 0.8); /* Más oscuro */
+    backdrop-filter: blur(12px);     /* Más desenfoque */
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-weight: 800; /* Más gruesa */
+    letter-spacing: -0.5px;
+    color: var(--text-primary) !important;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.panel-container {
+    flex: 1;
+    position: relative;
+    padding: 60px 0;
+}
+
+/* TÍTULO PRINCIPAL */
+.panel-header h1 {
+    font-weight: 800;
+    font-size: 3.5rem; /* Más grande y dramático */
+    letter-spacing: -1.5px;
+    margin-bottom: 10px;
+    background: linear-gradient(to bottom right, #fff, #94a3b8); /* Degradado en el texto */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: text;
+    color: transparent; /* Efecto de texto degradado */
+}
+
+/* BANNER DE ESTADO TIPO "CHIP" */
+.status-banner {
+    background: rgba(15, 23, 42, 0.6); /* Más oscuro y translúcido */
+    backdrop-filter: blur(10px);
+    border-radius: 50px; /* Bordes totalmente redondeados */
+    padding: 20px 40px;
+    margin-bottom: 60px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.status-banner h5 {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.status-banner p {
+    font-size: 0.9rem;
+}
+
+/* Indicadores de estado con glow */
+.status-open { border: 1px solid rgba(34, 197, 94, 0.3); box-shadow: 0 0 15px rgba(34, 197, 94, 0.15); }
+.status-closed { border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); }
+
+/* TARJETAS DE ADMINISTRACIÓN MODERNAS */
+.admin-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 25px; /* Bordes más suaves */
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--text-primary);
+    position: relative; /* Para el efecto glow */
+    overflow: hidden;
+}
+
+/* Efecto Hover Avanzado */
+.admin-card:hover {
+    transform: translateY(-8px);
+    background: var(--card-hover-bg);
+    border-color: rgba(59, 130, 246, 0.5); /* Borde azul neón */
+    color: var(--text-primary);
+    /* Resplandor neón azul al hover */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5), var(--neon-glow);
+}
+
+/* Iconos más grandes y con transición */
+.icon-box {
+    font-size: 4rem;
+    margin-bottom: 25px;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.admin-card:hover .icon-box {
+    transform: scale(1.1); /* Lieve aumento de tamaño al hover */
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.card-text {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* BOTONES MODERNOS */
+.btn-toggle {
+    font-weight: 700;
+    border-radius: 30px; /* Más redondeados */
+    padding: 12px 30px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+}
+
+.btn-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+
+/* FOOTER OSCURO */
+.panel-footer {
+    padding: 2.5rem 0;
+    text-align: center;
+    color: var(--text-secondary);
+    background: rgba(2, 6, 23, 0.9);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+/* Forzar que las flechas sean blancas y visibles */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: invert(1) brightness(100); /* Las vuelve blancas brillantes */
+    width: 3rem; /* Un poco más grandes */
+    height: 3rem;
+}
+
+/* Opcional: Que resalten más al pasar el mouse */
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+    transform: scale(1.1);
+    filter: invert(1) brightness(200);
+}
