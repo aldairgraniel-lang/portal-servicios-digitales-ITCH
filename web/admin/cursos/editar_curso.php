@@ -14,6 +14,7 @@ if(!$row){
     exit;
 }
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -33,6 +34,12 @@ if(!$row){
                         <label class="text-white-50 small ms-1">Nombre del Curso</label>
                         <input type="text" name="nombre" class="input-glass form-control" 
                                value="<?= htmlspecialchars($row['nombre']) ?>" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-white-50 small ms-1">Clave del Curso</label>
+                        <input type="text" name="clave" class="input-glass form-control" 
+                               value="<?= htmlspecialchars($row['clave'] ?? '') ?>" required>
                     </div>
                     
                     <button type="submit" class="btn btn-primary w-100 rounded-pill">Actualizar Cambios</button>

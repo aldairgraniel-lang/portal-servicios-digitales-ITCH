@@ -11,12 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // CASO ESPECIAL: Borrar todo no necesita un ID específico
     if ($accion === 'borrar_todo') {
-        // Si quieres también eliminar todos los archivos asociados:
         $result = $conexion->query("SELECT archivo FROM avisos");
         while ($row = $result->fetch_assoc()) {
             $archivo = $row['archivo'];
             if ($archivo) {
-                $ruta = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $archivo;
+                // Ruta corregida para eliminar el archivo dentro de /uploads/avisos/
+                $ruta = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avisos/' . $archivo;
                 if (file_exists($ruta)) {
                     unlink($ruta);
                 }
@@ -37,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->fetch();
                 $stmt->close();
 
-                // Eliminar archivo físico si existe
+                // Eliminar archivo físico si existe (Ruta corregida)
                 if ($archivo) {
-                    $ruta = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $archivo;
+                    $ruta = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avisos/' . $archivo;
                     if (file_exists($ruta)) {
                         unlink($ruta);
                     }
@@ -63,8 +63,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $titulo = $_POST['titulo'];
                 $contenido = $_POST['contenido'];
                 $tipo = $_POST['tipo'];
-                $stmt = $conexion->prepare("UPDATE avisos SET titulo = ?, contenido = ?, tipo = ? WHERE id = ?");
-                $stmt->bind_param("sssi", $titulo, $contenido, $tipo, $id);
+
+                $archivo = null;
+                if (isset($_FILES['archivo']) && $_FILES['archivo']['name'] !== '') {
+                    $ruta_destino = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avisos/';
+                    if (!is_dir($ruta_destino)) {
+                        mkdir($ruta_destino, 0777, true);
+                    }
+                    
+                    $nombre_archivo = time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '_', $_FILES['archivo']['name']);
+                    $archivo_destino = $ruta_destino . $nombre_archivo;
+                    
+                    if (move_uploaded_file($_FILES['archivo']['tmp_name'], $archivo_destino)) {
+                        $archivo = $nombre_archivo;
+                    }
+                }
+
+                if ($archivo) {
+                    $stmt = $conexion->prepare("UPDATE avisos SET titulo = ?, contenido = ?, tipo = ?, archivo = ? WHERE id = ?");
+                    $stmt->bind_param("ssssi", $titulo, $contenido, $tipo, $archivo, $id);
+                } else {
+                    $stmt = $conexion->prepare("UPDATE avisos SET titulo = ?, contenido = ?, tipo = ? WHERE id = ?");
+                    $stmt->bind_param("sssi", $titulo, $contenido, $tipo, $id);
+                }
                 $stmt->execute();
                 $_SESSION['mensaje'] = "Cambios guardados con éxito 💾";
                 break;

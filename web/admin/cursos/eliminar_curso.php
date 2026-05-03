@@ -3,10 +3,15 @@
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 
 // 2. Conexión a la base de datos
-include("../../conexion.php");$id = intval($_GET['id'] ?? 0);
-if($id>0){
-$stmt = $conexion->prepare("DELETE FROM cursos WHERE id=?");
-$stmt->bind_param("i",$id);
-$stmt->execute();
+include("../../conexion.php");
+$id = intval($_GET['id'] ?? 0);
+
+if($id > 0){
+    $stmt = $conexion->prepare("DELETE FROM cursos WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
 }
-header("Location: cursos.php");exit;
+
+header("Location: cursos.php");
+exit;

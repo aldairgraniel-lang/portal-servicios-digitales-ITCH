@@ -1,0 +1,59 @@
+/* =========================================================
+   ESTILOS PERSONALIZADOS PARA PREREGISTRO
+   ========================================================= */
+
+:root {
+    --bg-main: #0f172a;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --text-light: #f8fafc;
+    --text-secondary: #94a3b8;
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --danger-color: #dc3545;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-light);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+/* Tarjetas */
+.card.bg-dark {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Formularios */
+.form-control,
+.form-select {
+    background-color: #0f172a !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-light) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #0f172a !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    color: var(--text-light) !important;
+}
+
+/* Tablas */
+.table-dark {
+    --bs-table-bg: var(--card-bg);
+    --bs-table-color: var(--text-light);
+    --bs-table-hover-color: var(--text-light);
+    --bs-table-hover-bg: #334155;
+    --bs-table-border-color: var(--card-border);
+}
+
+.table-secondary.text-dark {
+    background-color: var(--card-border) !important;
+    color: var(--text-light) !important;
+    border-color: var(--card-border) !important;
+}

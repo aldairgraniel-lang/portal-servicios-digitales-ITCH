@@ -47,6 +47,7 @@ if ($id) {
     }
 }
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">

@@ -49,26 +49,12 @@ $resultado = $stmt->get_result();
 <head>
     <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ITCH - Listas Justificantes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        :root { --bg-dark: #021936; --card-bg: #021936; --text-primary: #f8fafc; }
-        body { background: #021936; color: var(--text-primary); min-height: 100vh; font-family: 'Inter', sans-serif; }
-        .card-panel { background: #333333; border-radius: 20px; padding: 30px; }
-        .table { color: var(--text-primary) !important; }
-        .btn-descargar { background: #3b82f6 !important; color: white !important; }
-        .btn-expedir { background: #10b981 !important; color: white !important; }
-        
-body { background: #021936; color: white; font-family: 'Inter', sans-serif; }
-        .form-control, .form-select { background-color: #1e293b !important; color: white !important; border: 1px solid #475569 !important; }
-        .form-control:focus { border-color: #0dcaf0 !important; box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important; }
-        .form-control::placeholder {
-    color: #ffffff !important; /* Un gris claro visible sobre el fondo #1e293b */
-    opacity: 1; /* Asegura que no se aplique transparencia extra */
-}
+        <link rel="stylesheet" href="css/constancias.css">
 
-    </style>
 </head>
 <body>
 <div class="container py-5">

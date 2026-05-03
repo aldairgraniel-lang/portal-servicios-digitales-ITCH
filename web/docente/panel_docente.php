@@ -1,11 +1,9 @@
 <?php
+// Esto DEBE ser lo primero para procesar el POST antes de cualquier salida
 if (session_status() === PHP_SESSION_NONE) session_start();
 include('includes/auth_docente.php');
 include(__DIR__ . "/../conexion.php");
 
-/**
- * LÓGICA DE CONTROL
- */
 if (isset($_POST['toggle'])) {
     if (!isset($_POST['tipo_registro'])) exit('Solicitud inválida');
 
@@ -30,7 +28,19 @@ if (isset($_POST['toggle'])) {
         $stmt = $conexion->prepare("UPDATE configuracion SET valor = ? WHERE clave = ?");
         $stmt->bind_param("ss", $nuevo, $tipo);
         $stmt->execute();
+
+        // 1. Detección de petición AJAX (Fetch API) para no recargar la página
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'nuevo_estado' => $nuevo
+            ]);
+            exit;
+        }
     }
+    
+    // Si no es petición AJAX (ej. JS desactivado), recarga normal
     header("Location: panel_docente.php");
     exit;
 }
@@ -54,51 +64,109 @@ $ingles_abierto = ($estado_ingles === '1');
 $presentacion_abierto = ($estado_presentacion === '1');
 $aceptacion_abierto = ($estado_aceptacion === '1');
 $justificantes_abierto = ($estado_justificantes === '1');
-
-// --- AHORA LLAMAMOS AL HEADER ---
-include('includes/header.php'); 
 ?>
-<title> ITCH | Panel Docente</title>
-    <header class="mb-5">
-        <h1 class="fw-bold">Division de Estudios Profesionales</h1>
-        <p class="text-light">Gestión de servicios escolares y procesos académicos.</p>
-    </header>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="img/imagen1.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITCH - División de Estudios Profesionales</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+<?php include('includes/header.php'); ?>
 
-    <div class="row g-4">
-        <?php 
-        $items = [
-            ['preregistro - verano', 'preregistro.php', '📄', $count_verano, $verano_abierto, 'registro_abierto'],
-            ['solicitudes - Inglés no inconveniencia', 'solicitudes_ingles.php', '📄', $count_ingles, $ingles_abierto, 'registro_ingles_abierto'],
-            ['solicitudes - Carta Presentación', 'solicitudes_presentacion.php', '📄', $count_presentacion, $presentacion_abierto, 'registro_presentacion_abierto'],
-            ['solicitudes - Carta Aceptación', 'solicitudes_aceptacion.php', '📄', $count_aceptacion, $aceptacion_abierto, 'registro_aceptacion_abierto'],
-            ['solicitudes - Justificantes', 'solicitudes_justificantes.php', '📝', $count_justificantes, $justificantes_abierto, 'registro_justificantes_abierto']
-        ];
+<div class="panel-header mb-4">
+    <h1>División de Estudios Profesionales</h1>
+    <p>Gestión de servicios escolares y procesos académicos.</p>
+</div>
 
-        foreach($items as $i): ?>
-        <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="card-modern">
-                <?php if($i[3] > 0): ?><span class="notification-badge"><?= $i[3] ?></span><?php endif; ?>
-                <a href="<?= $i[1] ?>" class="text-decoration-none text-white">
-                    <div class="fs-2 mb-3"><?= $i[2] ?></div>
-                    <h5 class="fw-bold"><?= $i[0] ?></h5>
-                    <p class="text-light small">Total: <?= $i[3] ?> registros</p>
-                </a>
-                
-                <form method="POST" class="mt-3">
-                    <input type="hidden" name="tipo_registro" value="<?= $i[5] ?>">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <span class="status-badge <?= $i[4] ? 'bg-open' : 'bg-closed' ?>">
-                            <?= $i[4] ? 'ABIERTO' : 'CERRADO' ?>
-                        </span>
-                        <button type="submit" name="toggle" class="btn btn-sm <?= $i[4] ? 'btn-outline-danger' : 'btn-outline-success' ?>">
-                            <?= $i[4] ? 'Cerrar' : 'Abrir' ?>
-                        </button>
-                    </div>
-                </form>
-            </div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <?php 
+    $items = [
+        ['preregistro - verano', 'preregistro.php', '📄', $count_verano, $verano_abierto, 'registro_abierto'],
+        ['solicitudes - Inglés no inconveniencia', 'solicitudes_ingles.php', '📄', $count_ingles, $ingles_abierto, 'registro_ingles_abierto'],
+        ['solicitudes - Carta Presentación', 'solicitudes_presentacion.php', '📄', $count_presentacion, $presentacion_abierto, 'registro_presentacion_abierto'],
+        ['solicitudes - Carta Aceptación', 'solicitudes_aceptacion.php', '📄', $count_aceptacion, $aceptacion_abierto, 'registro_aceptacion_abierto'],
+        ['solicitudes - Justificantes', 'solicitudes_justificantes.php', '📝', $count_justificantes, $justificantes_abierto, 'registro_justificantes_abierto']
+    ];
+
+    foreach($items as $i): ?>
+    <div class="col">
+        <div class="card-modern shadow-sm">
+            <?php if($i[3] > 0): ?>
+                <span class="notification-badge"><?= $i[3] ?></span>
+            <?php endif; ?>
+            
+            <a href="<?= $i[1] ?>" class="card-link text-white">
+                <div class="fs-2 mb-2"><?= $i[2] ?></div>
+                <h5 class="fw-bold mb-2" style="font-size: 1.15rem;"><?= htmlspecialchars($i[0]) ?></h5>
+                <p class="text-white-50 small mb-4">Total: <?= $i[3] ?> registros</p>
+            </a>
+            
+            <form class="toggle-form" method="POST">
+                <input type="hidden" name="tipo_registro" value="<?= $i[5] ?>">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="status-badge <?= $i[4] ? 'bg-open' : 'bg-closed' ?>">
+                        <?= $i[4] ? 'ABIERTO' : 'CERRADO' ?>
+                    </span>
+                    <button type="submit" name="toggle" class="btn btn-sm <?= $i[4] ? 'btn-outline-danger' : 'btn-outline-success' ?>">
+                        <?= $i[4] ? 'Cerrar' : 'Abrir' ?>
+                    </button>
+                </div>
+            </form>
         </div>
-        <?php endforeach; ?>
     </div>
-</main> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php endforeach; ?>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".toggle-form").forEach(form => {
+            form.addEventListener("submit", function(event) {
+                event.preventDefault(); // Previene la recarga de página por defecto
+                
+                const formData = new FormData(this);
+                formData.append('toggle', '1');
+
+                const statusBadge = this.querySelector(".status-badge");
+                const button = this.querySelector("button");
+
+                fetch(window.location.href, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.nuevo_estado === '1') {
+                            statusBadge.className = "status-badge bg-open";
+                            statusBadge.textContent = "ABIERTO";
+                            button.className = "btn btn-sm btn-outline-danger";
+                            button.textContent = "Cerrar";
+                        } else {
+                            statusBadge.className = "status-badge bg-closed";
+                            statusBadge.textContent = "CERRADO";
+                            button.className = "btn btn-sm btn-outline-success";
+                            button.textContent = "Abrir";
+                        }
+                    }
+                })
+                .catch(error => console.error("Error al conectar con el servidor:", error));
+            });
+        });
+    });
+</script>
+
+<?php 
+// Cerrar el <main> y el <div> (wrapper) que fueron abiertos en header.php
+?>
+</main>
+</div>
 </body>
 </html>

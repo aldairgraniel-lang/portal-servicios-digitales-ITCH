@@ -62,6 +62,7 @@ INSERT IGNORE INTO carreras (nombre) VALUES
 CREATE TABLE IF NOT EXISTS semestres (
   id INT AUTO_INCREMENT PRIMARY KEY,
   numero INT NOT NULL
+  
 );
 
 INSERT IGNORE INTO semestres (numero) VALUES
@@ -84,8 +85,9 @@ INSERT IGNORE INTO tipo_estudiante (nombre) VALUES
 -- =========================
 CREATE TABLE IF NOT EXISTS cursos (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(150) NOT NULL
-);
+  nombre VARCHAR(150) NOT NULL,
+  clave VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO cursos (nombre) VALUES
 ('Curso de Verano - Matemáticas'),

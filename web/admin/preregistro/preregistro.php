@@ -7,6 +7,7 @@ include('../../conexion.php');
 include("../includes/header.php");
 $result = mysqli_query($conexion, "SELECT * FROM VERANO ORDER BY id DESC");
 ?>
+   <link rel="stylesheet" href="../css/tablasS.css">
 
 <div class="container py-5">
     <div class="glass-card p-4 shadow-lg">

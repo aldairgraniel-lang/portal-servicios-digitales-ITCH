@@ -7,6 +7,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 include("../../conexion.php");
 include("../includes/header.php"); 
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">

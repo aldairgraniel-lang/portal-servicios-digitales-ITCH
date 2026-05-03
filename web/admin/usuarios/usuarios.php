@@ -5,6 +5,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 
 $res_usuarios = $conexion->query("SELECT id, usuario, rol FROM usuarios ORDER BY usuario ASC");
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="glass-card p-4 shadow-lg">
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
@@ -64,7 +65,7 @@ function eliminarUser(id) {
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         confirmButtonText: 'Sí, borrar',
-        background: '#0f172a', color: '#fff'
+        background: '#021936', color: '#fff'
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = 'procesar_usuario.php?accion=eliminar&id=' + id;

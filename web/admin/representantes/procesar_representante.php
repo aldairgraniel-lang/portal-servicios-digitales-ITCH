@@ -34,6 +34,8 @@ if (isset($_GET['id']) && !isset($_GET['accion'])) {
     // precargando los datos: value="<?= $representante['nombre'] "
     include("../includes/header.php");
     ?>
+       <link rel="stylesheet" href="../css/tablasG.css">
+
     <div class="glass-card p-4 shadow-lg" style="max-width: 600px; margin: auto;">
                 <div class="d-flex justify-content-between align-items-center mb-4 px-2">
                     <h4 class="m-0 fw-bold">Editar Representante</h4>
@@ -47,11 +49,11 @@ if (isset($_GET['id']) && !isset($_GET['accion'])) {
             
             <div class="mb-3">
                 <label>Número Control</label>
-                <input type="text" name="numero_control" class="form-control" value="<?= htmlspecialchars($representante['numero_control']) ?>" required>
+                <input type="text" name="numero_control" class="input-glass form-control" value="<?= htmlspecialchars($representante['numero_control']) ?>" required>
             </div>
             <div class="mb-3">
                 <label>Nombre</label>
-                <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($representante['nombre']) ?>" required>
+                <input type="text" name="nombre" class="input-glass form-control" value="<?= htmlspecialchars($representante['nombre']) ?>" required>
             </div>
             <button type="submit" class="btn btn-primary">Actualizar</button>
         </form>
@@ -69,3 +71,4 @@ if (isset($_POST['accion']) && $_POST['accion'] == 'actualizar') {
     exit();
 }
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">

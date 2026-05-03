@@ -9,6 +9,7 @@ include("../../conexion.php");
 include("../includes/header.php");
 $result = mysqli_query($conexion, "SELECT * FROM carreras ORDER BY id ASC");
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="glass-card p-4 shadow-lg">

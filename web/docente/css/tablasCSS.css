@@ -1,0 +1,32 @@
+/* estilos.css */
+
+body {
+    background: #021936;
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.card {
+    border-radius: 15px;
+    background: #1e293bb3;
+    backdrop-filter: blur(10px);
+    border: 1px solid #ffffff1a;
+}
+
+.form-control,
+.form-select {
+    background-color: #1e293b !important;
+    color: white !important;
+    border: 1px solid #475569 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0dcaf0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: #ffffff !important;
+    opacity: 1;
+}

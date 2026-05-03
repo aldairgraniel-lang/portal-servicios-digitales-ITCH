@@ -6,6 +6,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 include("../../conexion.php");
 include("../includes/header.php");
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -23,6 +24,12 @@ include("../includes/header.php");
                         <label class="text-white-50 small ms-1">Nombre del Curso</label>
                         <input type="text" name="nombre" class="input-glass form-control" required>
                     </div>
+                    
+                    <div class="mb-4">
+                        <label class="text-white-50 small ms-1">Clave del Curso</label>
+                        <input type="text" name="clave" class="input-glass form-control" required>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 rounded-pill">Guardar</button>
                 </form>
             </div>

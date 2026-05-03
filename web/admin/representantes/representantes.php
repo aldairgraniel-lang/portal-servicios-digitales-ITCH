@@ -8,6 +8,7 @@ include("../includes/header.php");
 
 $res_representantes = $conexion->query("SELECT * FROM representantes ORDER BY nombre ASC");
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="glass-card p-4 shadow-lg">
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">

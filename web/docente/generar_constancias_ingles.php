@@ -44,14 +44,11 @@ $hayResultados = ($alumnos && $alumnos->num_rows > 0);
     <meta charset="UTF-8">
     <title>Generar Constancias</title>
     <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        body { background: #021936; color: white; font-family: 'Inter', sans-serif; }
-        .card-glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .form-control { background-color: #1e293b !important; color: white !important; border: 1px solid #475569 !important; }
-        .form-control::placeholder { color: #ffffff !important; opacity: 1; }
-    </style>
+        <link rel="stylesheet" href="css/constancias.css">
+
 </head>
 <body>
 <div class="container py-5">

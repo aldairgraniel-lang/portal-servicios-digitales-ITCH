@@ -60,12 +60,8 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { background: #021936; color: white; font-family: 'Inter', sans-serif; }
-        .form-control, .form-select { background-color: #1e293b !important; color: white !important; border: 1px solid #475569 !important; }
-        .form-control:focus { border-color: #0dcaf0 !important; box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important; }
-        .form-control::placeholder { color: #ffffff !important; opacity: 1; }
-    </style>
+        <link rel="stylesheet" href="css/tablasCSS.css">
+
 </head>
 <body>
     <div class="container py-5">

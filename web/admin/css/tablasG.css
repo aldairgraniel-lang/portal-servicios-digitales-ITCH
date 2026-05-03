@@ -1,0 +1,28 @@
+/* Estilo para los inputs y selects */
+.input-glass,
+.select-glass {
+    background: #021936 !important;
+    border: 1px solid #021936 !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 10px 15px !important;
+    transition: all 0.3s ease;
+}
+
+.input-glass:focus,
+.select-glass:focus {
+    background: #021936 !important;
+    border-color: #4361ee !important;
+    /* El color azul de tu login */
+    box-shadow: 0 0 0 4px #ffffff1a !important;
+    color: #ffffff !important;
+}
+
+/* Estilos del contenedor */
+.glass-card {
+    background: #1e293bb3;
+    backdrop-filter: blur(15px);
+    border: 1px solid #ffffff1a;
+    border-radius: 24px;
+    color: white;
+}

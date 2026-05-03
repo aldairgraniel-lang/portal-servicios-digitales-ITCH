@@ -1,0 +1,104 @@
+:root {
+    --bg-dark: #021936;
+    --sidebar-bg: #04336c;
+    --accent-blue: #ff9534;
+    --text-p: #f8fafc;
+    --border: #ffffff14;
+}
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-p);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Estilos del Sidebar */
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+.nav-link {
+    color: #94a3b8;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #0062ff;
+    color: #fff;
+}
+
+/* Contenedor principal de contenidos */
+.wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Diseño único y exclusivo para el Header Superior */
+.top-navbar {
+    background: #ff9634d4;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Botón único para el Header */
+.top-navbar .logout-btn {
+    width: 200px;
+    font-size: 1.2rem;
+    padding: 10px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+}
+
+.top-navbar .logout-btn:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* --- Estilos adaptables (Responsive) --- */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        /* El sidebar se coloca arriba en móviles */
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        height: auto;
+    }
+
+    .top-navbar {
+        padding: 10px 15px;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .top-navbar .logout-btn {
+        width: auto;
+        /* Se hace flexible para no desbordarse */
+        font-size: 1rem;
+        padding: 6px 12px;
+    }
+}

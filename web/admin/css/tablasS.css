@@ -1,0 +1,101 @@
+/* Estilos de tabla y inputs (Glassmorphism) */
+body {
+    background: #021936;
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-control,
+.form-select {
+    background-color: #1e293b !important;
+    color: white !important;
+    border: 1px solid #475569 !important;
+}
+
+.form-control:focus {
+    border-color: #0dcaf0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: #ffffff !important;
+    opacity: 1;
+}
+
+.table {
+    --bs-table-bg: #1e293bb3 !important;
+    --bs-table-color: white !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.table thead th {
+    background: #ffffff0d !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-top: none;
+    padding: 15px 10px;
+}
+
+.input-glass {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: #fff !important;
+    padding: 8px !important;
+    width: 100%;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.input-glass:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: #ffffff1a !important;
+}
+
+.input-glass:focus {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border-color: #3b82f6 !important;
+    color: #60a5fa !important;
+    outline: none;
+}
+
+.select-glass {
+    background-color: #1e293b !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px;
+}
+
+/* Estilos del contenedor Glassmorphism */
+.glass-card {
+    background: #1e293bb3;
+    backdrop-filter: blur(15px);
+    border: 1px solid #ffffff1a;
+    border-radius: 24px;
+    color: white;
+}
+
+/* Botones de Acción */
+.btn-action {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-save:hover {
+    background: #3b82f6 !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+
+.btn-delete:hover {
+    background: #ef4444 !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}

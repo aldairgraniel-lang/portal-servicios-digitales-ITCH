@@ -1,0 +1,118 @@
+    /* --- TU CSS ORIGINAL --- */
+    .boton-servicio {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        border-radius: 10px !important;
+        border: none !important;
+    }
+
+    .boton-servicio:hover {
+        transform: scale(1.05) translateY(-5px) !important;
+        box-shadow: 0 15px 30px rgba(0, 170, 255, 0.3) !important;
+        filter: brightness(1.15) !important;
+    }
+
+    .footer-pro {
+        background-color: #00264d;
+        color: #ffffff;
+        padding: 60px 0 30px 0;
+        margin-top: 50px;
+    }
+
+    .footer-pro h5 {
+        color: #00aaff;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .footer-pro p,
+    .footer-pro a {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #e0e0e0 !important;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .footer-pro a:hover {
+        color: #ffffff !important;
+        padding-left: 5px;
+    }
+
+    .map-wrapper {
+        aspect-ratio: 16 / 9;
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        border: 2px solid #00aaff;
+    }
+
+    @media (max-width: 768px) {
+        .footer-pro {
+            text-align: center;
+        }
+    }
+
+    /* --- NUEVO: ESTILOS DE LA BARRA LATERAL --- */
+    .social-sidebar {
+        position: fixed;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .social-sidebar a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        color: white;
+        text-decoration: none;
+        transition: 0.3s;
+        font-size: 20px;
+    }
+
+    .social-sidebar a:hover {
+        width: 60px;
+    }
+
+    /* Efecto expansión al pasar el mouse */
+    .bg-fb {
+        background: #3b5998;
+        border-radius: 8px 0 0 0;
+    }
+
+    .bg-tw {
+        background: #1da1f2;
+    }
+
+    .bg-yt {
+        background: #ff0000;
+        border-radius: 0 0 0 8px;
+    }
+
+    .bg-info-btn {
+        background: #eeff0000;
+        border-radius: 0%;
+    }
+
+    .bg-info-btn:hover {
+        background: #ffffff00;
+        color: #000000 !important;
+    }
+
+    .bg-info-btn i {
+        color: #ffffff;
+        font-size: 18px;
+    }
+
+    .bg-info-btn:hover i {
+        color: #ffea00;
+    }

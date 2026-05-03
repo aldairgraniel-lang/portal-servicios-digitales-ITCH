@@ -47,8 +47,7 @@ if (isset($_GET['id'])) {
 // 4. Incluir el diseño (header)
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 ?>
-
-<div class="container py-5">
+   <link rel="stylesheet" href="../css/tablasG.css">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="glass-card p-4 shadow-lg">

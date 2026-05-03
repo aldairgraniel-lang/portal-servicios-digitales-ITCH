@@ -153,7 +153,7 @@ $modales_html = "";
 
                                                 <?php if (!empty($aviso['archivo'])): ?>
                                                     <div class="mt-4">
-                                                        <a href="uploads/<?= $aviso['archivo'] ?>" target="_blank" class="btn btn-primary w-100 py-2">
+                                                        <a href="uploads/avisos/<?= $aviso['archivo'] ?>" target="_blank" class="btn btn-primary w-100 py-2">
                                                             📥 Descargar Archivo Adjunto
                                                         </a>
                                                     </div>

@@ -24,17 +24,17 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
 
     <style>
         body {
-            background: radial-gradient(circle at top right, #1e293b, #0f172a); 
+            background: radial-gradient(circle at top right, #021936, #021936); 
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
             color: #f8fafc;
         }
 
         .navbar {
-            background: rgba(15, 23, 42, 0.8) !important;
+            background: #0f1729cc !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #ffffff14;
             padding: 0.7rem 1.5rem;
             position: sticky;
             top: 0;

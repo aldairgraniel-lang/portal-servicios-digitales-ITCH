@@ -1,6 +1,5 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
-// Asegúrate de que la ruta a auth_docente sea correcta
 require_once(__DIR__ . "/../../conexion.php");
 
 $accion = $_GET['accion'] ?? '';
@@ -8,26 +7,31 @@ $accion = $_GET['accion'] ?? '';
 // --- CREAR ---
 if ($accion == 'crear' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = trim($_POST['nombre']);
-    if (!empty($nombre)) {
-        // mysqli preparación
-        $stmt = $conexion->prepare("INSERT INTO cursos (nombre) VALUES (?)");
-        $stmt->bind_param("s", $nombre); // "s" significa string
+    $clave = trim($_POST['clave']);
+    
+    if (!empty($nombre) && !empty($clave)) {
+        $stmt = $conexion->prepare("INSERT INTO cursos (nombre, clave) VALUES (?, ?)");
+        $stmt->bind_param("ss", $nombre, $clave);
         $stmt->execute();
         $stmt->close();
+        $_SESSION['mensaje'] = 'Curso creado correctamente.';
     }
-    header("Location: cursos.php"); // Redirigir a cursos.php
+    header("Location: cursos.php");
     exit;
 }
+
 // --- ACTUALIZAR ---
 if ($accion == 'actualizar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = $_POST['id'];
     $nombre = trim($_POST['nombre']);
+    $clave = trim($_POST['clave']);
     
-    if (!empty($nombre) && !empty($id)) {
-        $stmt = $conexion->prepare("UPDATE cursos SET nombre = ? WHERE id = ?");
-        $stmt->bind_param("si", $nombre, $id);
+    if (!empty($nombre) && !empty($clave) && !empty($id)) {
+        $stmt = $conexion->prepare("UPDATE cursos SET nombre = ?, clave = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $nombre, $clave, $id);
         $stmt->execute();
         $stmt->close();
+        $_SESSION['mensaje'] = 'Curso actualizado correctamente.';
     }
     header("Location: cursos.php");
     exit;
@@ -35,15 +39,12 @@ if ($accion == 'actualizar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // --- ELIMINAR ---
 if ($accion == 'eliminar' && isset($_GET['id'])) {
-    // mysqli preparación
     $stmt = $conexion->prepare("DELETE FROM cursos WHERE id = ?");
-    $stmt->bind_param("i", $_GET['id']); // "i" significa integer
+    $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
     $stmt->close();
-    header("Location: cursos.php"); // Redirigir a cursos.php
+    $_SESSION['mensaje'] = 'Curso eliminado correctamente.';
+    header("Location: cursos.php");
     exit;
 }
-
-
-
 ?>

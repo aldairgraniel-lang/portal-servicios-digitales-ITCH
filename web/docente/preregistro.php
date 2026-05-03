@@ -52,16 +52,7 @@ $cursos = $conexion->query("SELECT DISTINCT curso_interes FROM VERANO ORDER BY c
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { background: #021936; color: white; font-family: 'Inter', sans-serif; }
-        .card { border-radius: 15px; background: #1e293bb3; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .form-control, .form-select { background-color: #1e293b !important; color: white !important; border: 1px solid #475569 !important; }
-        .form-control:focus, .form-select:focus { border-color: #0dcaf0 !important; box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important; }
-    .form-control::placeholder {
-    color: #ffffff !important; /* Un gris claro visible sobre el fondo #1e293b */
-    opacity: 1; /* Asegura que no se aplique transparencia extra */
-}
-    </style>
+<link rel="stylesheet" href="css/Avisos.css">
 </head>
 <body>
 

@@ -6,139 +6,131 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 include("../../conexion.php");
 include("../includes/header.php"); 
 
-$res_avisos = $conexion->query("SELECT * FROM avisos ORDER BY fecha_pub DESC");
+// Lógica de filtrado por categoría/tipo
+$filtro_tipo = '';
+if (isset($_GET['tipo']) && trim($_GET['tipo']) !== '') {
+    $filtro_tipo = $conexion->real_escape_string(trim($_GET['tipo']));
+    $query = "SELECT * FROM avisos WHERE tipo = '$filtro_tipo' ORDER BY fecha_pub DESC";
+} else {
+    $query = "SELECT * FROM avisos ORDER BY fecha_pub DESC";
+}
+
+$res_avisos = $conexion->query($query);
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="../css/tablasS.css">
 
-<style>
-    /* Estilos de tabla y inputs (Glassmorphism) */
-    .table {
-        --bs-table-bg: transparent !important;
-        --bs-table-color: white !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .input-glass {
-        background: transparent !important;
-        border: 1px solid transparent !important;
-        color: #fff !important;
-        padding: 8px !important;
-        width: 100%;
-        border-radius: 8px;
-        transition: all 0.3s;
-    }
-
-    .input-glass:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .input-glass:focus {
-        background: rgba(15, 23, 42, 0.7) !important;
-        border-color: #3b82f6 !important;
-        color: #60a5fa !important;
-        outline: none;
-    }
-
-    .select-glass {
-        background-color: #1e293b !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px;
-    }
-
-    /* Botones de Acción */
-    .btn-action {
-        width: 38px; height: 38px;
-        display: inline-flex; align-items: center; justify-content: center;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-        transition: all 0.3s;
-    }
-
-    .btn-save:hover { background: #3b82f6 !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
-    .btn-delete:hover { background: #ef4444 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
-
-    .table thead th {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #94a3b8 !important;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-        border-top: none;
-        padding: 15px 10px;
-    }
-</style>
-
-<div class="glass-card p-4 shadow-lg" style="background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <div>
-            <h3 class="fw-bold m-0"><i class="bi bi-pencil-square me-2"></i>Gestión de Avisos</h3>
-            <span class="text-white-50 small">Actualiza o elimina comunicados directamente</span>
+<div class="container py-4">
+    <div class="glass-card p-4 shadow-lg" style="background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+            <div>
+                <h3 class="fw-bold m-0 text-white"><i class="bi bi-pencil-square me-2"></i>Gestión de Avisos</h3>
+                <span class="text-white-50 small">Actualiza o elimina comunicados directamente</span>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-house-door me-1"></i> Inicio
+                </a>
+                <button onclick="confirmarBorrarTodo()" class="btn btn-danger btn-sm rounded-pill px-3">
+                    <i class="bi bi-trash-fill me-1"></i> Borrar Todo
+                </button>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                <i class="bi bi-house-door me-1"></i> Inicio
-            </a>
-            <button onclick="confirmarBorrarTodo()" class="btn btn-danger btn-sm rounded-pill px-3">
-                <i class="bi bi-trash-fill me-1"></i> Borrar Todo
-            </button>
+
+        <form method="GET" class="mb-4 px-2">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="tipo" class="col-form-label text-white fw-semibold">Filtrar por Categoría:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="tipo" id="tipo" class="form-select bg-dark text-white border-secondary">
+                        <option value="">Todas las categorías</option>
+                        <option value="info" <?= $filtro_tipo == 'info' ? 'selected' : '' ?>>Info</option>
+                        <option value="advertencia" <?= $filtro_tipo == 'advertencia' ? 'selected' : '' ?>>Aviso</option>
+                        <option value="urgente" <?= $filtro_tipo == 'urgente' ? 'selected' : '' ?>>Urgente</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                    <?php if(!empty($filtro_tipo)): ?>
+                        <a href="avisos.php" class="btn btn-secondary"> <i class="bi bi-x-circle me-1"></i> Limpiar
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th width="10%">Estado</th>
+                        <th width="40%">Contenido del Aviso</th>
+                        <th width="25%">Categoría</th>
+                        <th width="25%">Archivo Adjunto</th>
+                        <th width="20%" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-white-100">
+                    <?php if ($res_avisos && $res_avisos->num_rows > 0): ?>
+                        <?php while($av = $res_avisos->fetch_assoc()): ?>
+                        <tr>
+                            <form action="procesar_aviso.php" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="id" value="<?= $av['id'] ?>">
+                                
+                                <td>
+                                    <button type="submit" name="accion" value="toggle" class="btn-action border-0" title="Cambiar visibilidad" style="color: <?= $av['activo'] ? '#4ade80' : '#f87171' ?>;">
+                                        <i class="bi <?= $av['activo'] ? 'bi-toggle-on' : 'bi-toggle-off' ?> fs-4"></i>
+                                    </button>
+                                </td>
+
+                                <td>
+                                    <input type="text" name="titulo" class="input-glass fw-bold" value="<?= htmlspecialchars($av['titulo']) ?>" style="color: #3b82f6 !important;">
+                                    <textarea name="contenido" class="input-glass small text-white-50" rows="1"><?= htmlspecialchars($av['contenido']) ?></textarea>
+                                </td>
+
+                                <td>
+                                    <select name="tipo" class="form-select form-select-sm select-glass">
+                                        <option value="info" <?= $av['tipo']=='info' ? 'selected' : '' ?>>Info</option>
+                                        <option value="advertencia" <?= $av['tipo']=='advertencia' ? 'selected' : '' ?>>Aviso</option>
+                                        <option value="urgente" <?= $av['tipo']=='urgente' ? 'selected' : '' ?>>Urgente</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="file" name="archivo" class="form-control form-control-sm select-glass text-white-50">
+                                    <?php if (!empty($av['archivo'])): ?>
+                                        <small class="d-block text-info mt-1"><a href="../../uploads/avisos/<?= $av['archivo'] ?>" target="_blank" style="color: #60a5fa;">Ver archivo actual</a></small>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td class="text-end">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button type="submit" name="accion" value="editar" class="btn-action btn-save" title="Guardar cambios">
+                                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                                        </button>
+                                        <button type="button" class="btn-action btn-delete" onclick="eliminar(<?= $av['id'] ?>)" title="Eliminar este aviso">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-white py-4">
+                                <i class="bi bi-exclamation-circle me-2"></i> No se encontraron registros.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th width="10%">Estado</th>
-                    <th width="50%">Contenido del Aviso</th>
-                    <th width="20%">Categoría</th>
-                    <th width="20%" class="text-end">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while($av = $res_avisos->fetch_assoc()): ?>
-                <tr>
-                    <form action="procesar_aviso.php" method="POST">
-                        <input type="hidden" name="id" value="<?= $av['id'] ?>">
-                        
-                        <td>
-                            <button type="submit" name="accion" value="toggle" class="btn-action border-0" title="Cambiar visibilidad" style="color: <?= $av['activo'] ? '#4ade80' : '#f87171' ?>;">
-                                <i class="bi <?= $av['activo'] ? 'bi-toggle-on' : 'bi-toggle-off' ?> fs-4"></i>
-                            </button>
-                        </td>
-
-                        <td>
-                            <input type="text" name="titulo" class="input-glass fw-bold" value="<?= htmlspecialchars($av['titulo']) ?>" style="color: #3b82f6 !important;">
-                            <textarea name="contenido" class="input-glass small text-white-50" rows="1"><?= htmlspecialchars($av['contenido']) ?></textarea>
-                        </td>
-
-                        <td>
-                            <select name="tipo" class="form-select form-select-sm select-glass">
-                                <option value="info" <?= $av['tipo']=='info' ? 'selected' : '' ?>>Info</option>
-                                <option value="advertencia" <?= $av['tipo']=='advertencia' ? 'selected' : '' ?>>Aviso</option>
-                                <option value="urgente" <?= $av['tipo']=='urgente' ? 'selected' : '' ?>>Urgente</option>
-                            </select>
-                        </td>
-
-                        <td class="text-end">
-                            <div class="d-flex gap-2 justify-content-end">
-                                <button type="submit" name="accion" value="editar" class="btn-action btn-save" title="Guardar cambios">
-                                    <i class="bi bi-cloud-arrow-up-fill"></i>
-                                </button>
-                                <button type="button" class="btn-action btn-delete" onclick="eliminar(<?= $av['id'] ?>)" title="Eliminar este aviso">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </form>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
     </div>
 </div>
 
@@ -224,5 +216,3 @@ function enviarFormulario(id, accion) {
     <?php unset($_SESSION['mensaje']); ?>
 <?php endif; ?>
 </script>
-
-<?php ?>

@@ -79,23 +79,17 @@ $hayResultados = ($result && mysqli_num_rows($result) > 0);
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>ITCH - Listas Presentación</title>
 </head>
-<style>
-        .form-control, .form-select { background-color: #1e293b !important; color: white !important; border: 1px solid #475569 !important; }
-        .form-control:focus { border-color: #0dcaf0 !important; box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important; }
-        .form-control::placeholder {
-    color: #ffffff !important; /* Un gris claro visible sobre el fondo #1e293b */
-    opacity: 1; /* Asegura que no se aplique transparencia extra */
-}
-
+    <link rel="stylesheet" href="css/tablasCSS.css">
 </style>
-<body style="background: #021936; color: white;">
+<body>
     <div class="container py-5">
         <div class="card bg-dark border-secondary p-4 text-white shadow-lg" style="border-radius: 15px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px);">
             <div class="d-flex justify-content-between align-items-center mb-4">

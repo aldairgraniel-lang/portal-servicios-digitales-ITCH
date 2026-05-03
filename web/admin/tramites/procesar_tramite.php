@@ -46,6 +46,8 @@ if (isset($_GET['id'])) {
 // 3. Diseño (HTML)
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
+
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -76,3 +78,4 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 </div>
 
 <?php ?>
+<link rel="stylesheet" href="/admin/adminCSS.css?v=<?php echo time(); ?>"><div class="container py-5">

@@ -30,6 +30,7 @@ $stmt->bind_param("i", $id);
 $stmt->execute();
 $alumno = $stmt->get_result()->fetch_assoc();
 ?>
+   <link rel="stylesheet" href="../css/tablasS.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">

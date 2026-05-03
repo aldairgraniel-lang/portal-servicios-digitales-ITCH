@@ -40,126 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <style>
-        :root {
-            --primary-color: #4361ee;
-        }
-
-        body {
-            /* Gradiente oscuro profundo para que el cristal resalte */
-            background: radial-gradient(circle at center, #04336c 30%, #ff9534 150%);
-            
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        /* Tarjeta de Cristal */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .login-logo {
-            font-size: 3rem;
-            color: #ffffff;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 0 10px rgba(67, 97, 238, 0.5));
-        }
-        .login-logo img {
-    border-radius: 50%;       /* Convierte la imagen en un círculo */
-    width: 100px;             /* Ancho fijo */
-    height: 100px;            /* Altura fija (igual al ancho para que sea círculo) */
-    object-fit: cover;        /* Asegura que la imagen llene el círculo sin deformarse */
-    border: 2px solid rgba(255, 255, 255, 0.2); /* Opcional: un borde sutil para que resalte más */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-        .login-title {
-            color: #ffffff;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Estilo de los Inputs */
-        .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 15px;
-            color: #ffffff;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
-            color: #ffffff;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Botón Moderno */
-        .btn-login {
-            background: var(--primary-color);
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            margin-top: 1rem;
-        }
-
-        .btn-login:hover {
-            background: #3751d4;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
-        }
-
-        .alert-modern {
-            background: rgba(255, 23, 68, 0.1);
-            border: 1px solid rgba(255, 23, 68, 0.2);
-            color: #ff5252;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/login.css">
 </head>
 <body>
 
-<div class="glass-card text-center">
+<div class="glass-card text-center p-4">
 <div class="login-logo">
-<img src="img/1.GIF" alt="" style="max-width: 100px; height: auto; filter: drop-shadow(0 0 10px rgba(67, 97, 238, 0.5));">
+<img src="img/1.GIF" alt="" style="max-width: 100px; height: auto; filter: drop-shadow(0 0 10px rgb(255, 255, 255));">
 </div>
 
     

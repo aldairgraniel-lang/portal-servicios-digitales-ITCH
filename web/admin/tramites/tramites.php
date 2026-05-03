@@ -5,6 +5,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 
 $res_tramites = $conexion->query("SELECT * FROM tipos_tramite ORDER BY nombre_tramite ASC");
 ?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="glass-card p-4 shadow-lg">
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
@@ -69,3 +70,4 @@ function eliminarTramite(id) {
     });
 }
 </script>
+

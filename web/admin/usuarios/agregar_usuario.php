@@ -5,33 +5,8 @@ include($_SERVER['DOCUMENT_ROOT'] . '/conexion.php');
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 
 ?>
-<style>
-    /* Estilo para los inputs y selects */
-    .input-glass, .select-glass {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-        border-radius: 12px !important;
-        padding: 10px 15px !important;
-        transition: all 0.3s ease;
-    }
+   <link rel="stylesheet" href="../css/tablasG.css">
 
-    .input-glass:focus, .select-glass:focus {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: #4361ee !important; /* El color azul de tu login */
-        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15) !important;
-        color: #ffffff !important;
-    }
-
-    /* Estilos del contenedor */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        color: white;
-    }
-</style>
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-5">

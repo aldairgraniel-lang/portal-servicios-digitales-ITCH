@@ -5,6 +5,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 // 2. Conexión a la base de datos
 include("../../conexion.php");
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');?>
+   <link rel="stylesheet" href="../css/tablasG.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">

@@ -6,14 +6,17 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 include("../../conexion.php");
 $id = intval($_POST['id'] ?? 0);
 $nombre = trim($_POST['nombre']);
+$clave = trim($_POST['clave']);
 
 if($id > 0){
-$stmt = $conexion->prepare("UPDATE cursos SET nombre=? WHERE id=?");
-$stmt->bind_param("si",$nombre,$id);
+    $stmt = $conexion->prepare("UPDATE cursos SET nombre=?, clave=? WHERE id=?");
+    $stmt->bind_param("ssi", $nombre, $clave, $id);
 }else{
-$stmt = $conexion->prepare("INSERT INTO cursos(nombre) VALUES(?)");
-$stmt->bind_param("s",$nombre);
+    $stmt = $conexion->prepare("INSERT INTO cursos(nombre, clave) VALUES(?, ?)");
+    $stmt->bind_param("ss", $nombre, $clave);
 }
 $stmt->execute();
+$stmt->close();
+
 header("Location: cursos.php");
 exit;
