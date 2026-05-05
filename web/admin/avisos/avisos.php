@@ -19,7 +19,7 @@ if (isset($_GET['tipo']) && trim($_GET['tipo']) !== '') {
     $stmt->execute();
     $res_avisos = $stmt->get_result();
 } else {
-    $query = "SELECT * FROM avisos ORDER BY fecha_pub DESC";
+    $query = "SELECT * FROM avisos ORDER BY fecha_registro DESC";
     $res_avisos = $conexion->query($query);
 }
 ?>
@@ -39,9 +39,7 @@ if (isset($_GET['tipo']) && trim($_GET['tipo']) !== '') {
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-house-door me-1"></i> Inicio
                 </a>
-                <button onclick="confirmarBorrarTodo()" class="btn btn-danger btn-sm rounded-pill px-3">
-                    <i class="bi bi-trash-fill me-1"></i> Borrar Todo
-                </button>
+               
             </div>
         </div>
 

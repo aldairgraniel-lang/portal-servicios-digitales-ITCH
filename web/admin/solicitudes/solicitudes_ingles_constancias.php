@@ -5,14 +5,102 @@ include("../includes/header.php");
 
 // Lógica de filtrado
 $filtro_n_control = '';
-if (isset($_GET['numero_control']) && trim($_GET['numero_control']) !== '') {
-    $filtro_n_control = $conexion->real_escape_string(trim($_GET['numero_control']));
-    $query = "SELECT * FROM registro_ingles WHERE numero_control LIKE '%$filtro_n_control%' ORDER BY fecha_registro DESC";
+$filtro_carrera = '';
+$filtro_periodo = '';
+
+if (isset($_GET['numero_control'])) {
+    $filtro_n_control = trim($_GET['numero_control']);
+}
+if (isset($_GET['carrera'])) {
+    $filtro_carrera = trim($_GET['carrera']);
+}
+if (isset($_GET['periodo'])) {
+    $filtro_periodo = trim($_GET['periodo']);
+}
+
+$condiciones = [];
+
+if ($filtro_n_control !== '') {
+    $nc_escaped = $conexion->real_escape_string($filtro_n_control);
+    $condiciones[] = "numero_control LIKE '%$nc_escaped%'";
+}
+
+if ($filtro_carrera !== '') {
+    $carrera_escaped = $conexion->real_escape_string($filtro_carrera);
+    $condiciones[] = "carrera = '$carrera_escaped'";
+}
+
+if ($filtro_periodo !== '') {
+    $periodo_escaped = $conexion->real_escape_string($filtro_periodo);
+    $condiciones[] = "periodo = '$periodo_escaped'";
+}
+
+if (count($condiciones) > 0) {
+    $query = "SELECT * FROM registro_ingles WHERE " . implode(' AND ', $condiciones) . " ORDER BY fecha_registro DESC";
 } else {
     $query = "SELECT * FROM registro_ingles ORDER BY fecha_registro DESC";
 }
 
 $res_solicitudes = $conexion->query($query);
+
+// Obtener datos para los selects desde registro_ingles (filtros de búsqueda)
+$carreras = [];
+$res_carreras = $conexion->query("SELECT DISTINCT carrera FROM registro_ingles WHERE carrera IS NOT NULL AND carrera != '' ORDER BY carrera ASC");
+if ($res_carreras) {
+    while ($row = $res_carreras->fetch_assoc()) {
+        $carreras[] = $row['carrera'];
+    }
+    $res_carreras->free();
+}
+
+$periodos = [];
+$res_periodos = $conexion->query("SELECT DISTINCT periodo FROM registro_ingles WHERE periodo IS NOT NULL AND periodo != '' ORDER BY periodo DESC");
+if ($res_periodos) {
+    while ($row = $res_periodos->fetch_assoc()) {
+        $periodos[] = $row['periodo'];
+    }
+    $res_periodos->free();
+}
+
+// ------------------------------------------------------------------------
+// Obtener datos para los SELECTS del Modal desde sus tablas reales en la BD.
+// Nota: Ajusta los nombres de las tablas y las columnas según la estructura real de tu base de datos.
+// ------------------------------------------------------------------------
+$carreras_db = [];
+$res_carr_db = $conexion->query("SELECT * FROM carreras ORDER BY nombre ASC"); 
+if ($res_carr_db) {
+    while ($row = $res_carr_db->fetch_assoc()) {
+        $carreras_db[] = $row;
+    }
+    $res_carr_db->free();
+}
+
+$periodos_db = [];
+$res_per_db = $conexion->query("SELECT * FROM periodos ORDER BY nombre DESC");
+if ($res_per_db) {
+    while ($row = $res_per_db->fetch_assoc()) {
+        $periodos_db[] = $row;
+    }
+    $res_per_db->free();
+}
+
+$tipos_alumno_db = [];
+$res_tipo_db = $conexion->query("SELECT * FROM tipo_estudiante ORDER BY nombre ASC");
+if ($res_tipo_db) {
+    while ($row = $res_tipo_db->fetch_assoc()) {
+        $tipos_alumno_db[] = $row;
+    }
+    $res_tipo_db->free();
+}
+
+$semestres_db = [];
+$res_sem_db = $conexion->query("SELECT * FROM semestres ORDER BY numero ASC");
+if ($res_sem_db) {
+    while ($row = $res_sem_db->fetch_assoc()) {
+        $semestres_db[] = $row;
+    }
+    $res_sem_db->free();
+}
 ?>
 <link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>">
 <div class="container py-5">
@@ -29,9 +117,6 @@ $res_solicitudes = $conexion->query($query);
                 <span class="text-white-50 small">Gestión de constancias de no inconveniencia</span>
             </div>
             <div>
-                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalIngles" onclick="limpiarIngles()">
-                    <i class="bi bi-plus-circle me-1"></i> Nuevo
-                </button>
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-house-door me-1"></i> Inicio
                 </a>
@@ -40,21 +125,35 @@ $res_solicitudes = $conexion->query($query);
 
         <form method="GET" class="mb-4 px-2">
             <div class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <label for="numero_control" class="col-form-label text-white fw-semibold">Filtrar por N° Control:</label>
+                <div class="col-12 col-md-auto">
+                    <input type="text" id="numero_control" name="numero_control" class="form-control bg-dark text-white border-secondary" value="<?= htmlspecialchars($filtro_n_control ?? '') ?>" placeholder="Escribe el N° Control...">
                 </div>
-                <div class="col-auto">
-                    <input type="text" id="numero_control" name="numero_control" class="form-control bg-dark text-white border-secondary" value="<?= htmlspecialchars($filtro_n_control) ?>" placeholder="Escribe el N° Control...">
+
+                <div class="col-12 col-md-auto">
+                    <select id="carrera_filtro" name="carrera" class="form-control bg-dark text-white border-secondary">
+                        <option value="">Todas las carreras</option>
+                        <?php foreach ($carreras as $c): ?>
+                            <option value="<?= htmlspecialchars($c) ?>" <?= (isset($filtro_carrera) && $filtro_carrera === $c) ? 'selected' : '' ?>><?= htmlspecialchars($c) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <div class="col-auto">
+
+                <div class="col-12 col-md-auto">
+                    <select id="periodo_filtro" name="periodo" class="form-control bg-dark text-white border-secondary">
+                        <option value="">Todos los periodos</option>
+                        <?php foreach ($periodos as $p): ?>
+                            <option value="<?= htmlspecialchars($p) ?>" <?= (isset($filtro_periodo) && $filtro_periodo === $p) ? 'selected' : '' ?>><?= htmlspecialchars($p) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="col-12 col-md-auto d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Buscar
                     </button>
-                    <?php if(!empty($filtro_n_control)): ?>
-                        <a href="solicitudes_ingles_constancias.php" class="btn btn-secondary">
-                            <i class="bi bi-x-circle me-1"></i> Limpiar
-                        </a>
-                    <?php endif; ?>
+                    <a href="solicitudes_ingles_constancias.php" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                    </a>
                 </div>
             </div>
         </form>
@@ -66,6 +165,8 @@ $res_solicitudes = $conexion->query($query);
                         <th>Alumno</th>
                         <th>Carrera</th>
                         <th>Periodo</th>
+                        <th>Tipo Alumno</th>
+                        <th>Semestre</th>
                         <th>Fecha Registro</th>
                         <th class="text-end">Acciones</th>
                     </tr>
@@ -80,21 +181,25 @@ $res_solicitudes = $conexion->query($query);
                             </td>
                             <td class="text-white"><?= htmlspecialchars($sol['carrera']) ?></td>
                             <td class="text-white"><?= htmlspecialchars($sol['periodo']) ?></td>
+                            <td class="text-white"><?= htmlspecialchars($sol['tipo_alumno']) ?></td>
+                            <td class="text-white"><?= htmlspecialchars($sol['semestre'] ?? 'N/A') ?></td>
                             <td class="text-white"><?= date('d/m/Y', strtotime($sol['fecha_registro'])) ?></td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-warning text-white me-1" title="Editar" 
-                                        onclick="editarIngles(<?= htmlspecialchars(json_encode($sol)) ?>)">
-                                    Editar
-                                </button>
-                                <button onclick="eliminarIngles(<?= $sol['id'] ?>)" class="btn btn-sm btn-danger" title="Eliminar solicitud">
-                                    Eliminar
-                                </button>
+                                <div class="d-inline-flex">
+                                    <button class="btn btn-sm btn-warning text-white me-1" title="Editar" 
+                                            onclick="editarIngles(<?= htmlspecialchars(json_encode($sol)) ?>)">
+                                        Editar
+                                    </button>
+                                    <button onclick="eliminarIngles(<?= $sol['id'] ?>)" class="btn btn-sm btn-danger" title="Eliminar solicitud">
+                                        Eliminar
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center text-white py-4">
+                            <td colspan="7" class="text-center text-white py-4">
                                 <i class="bi bi-exclamation-circle me-2"></i> No se encontraron registros.
                             </td>
                         </tr>
@@ -125,18 +230,47 @@ $res_solicitudes = $conexion->query($query);
                         <label for="numero_control_ingles" class="form-label">N° de Control</label>
                         <input type="text" class="form-control bg-dark text-white border-secondary" id="numero_control_ingles" name="numero_control" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="carrera_ingles" class="form-label">Carrera</label>
-                        <input type="text" class="form-control bg-dark text-white border-secondary" id="carrera_ingles" name="carrera" required>
+                        <select class="form-control bg-dark text-white border-secondary" id="carrera_ingles" name="carrera" required>
+                            <option value="">Seleccione una carrera</option>
+                            <?php foreach ($carreras_db as $c): ?>
+                                <option value="<?= htmlspecialchars($c['nombre'] ?? $c['carrera']) ?>"><?= htmlspecialchars($c['nombre'] ?? $c['carrera']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="periodo_ingles" class="form-label">Periodo</label>
-                        <input type="text" class="form-control bg-dark text-white border-secondary" id="periodo_ingles" name="periodo" required>
+                        <select class="form-control bg-dark text-white border-secondary" id="periodo_ingles" name="periodo" required>
+                            <option value="">Seleccione un periodo</option>
+                            <?php foreach ($periodos_db as $p): ?>
+                                <option value="<?= htmlspecialchars($p['periodo'] ?? $p['nombre']) ?>"><?= htmlspecialchars($p['periodo'] ?? $p['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+
                     <div class="mb-3">
-                        <label for="archivo_ingles" class="form-label">Archivo de Respaldo</label>
-                        <input type="file" class="form-control bg-dark text-white border-secondary" id="archivo_ingles" name="archivo">
+                        <label for="tipo_alumno_ingles" class="form-label">Tipo de Alumno</label>
+                        <select class="form-control bg-dark text-white border-secondary" id="tipo_alumno_ingles" name="tipo_alumno" required>
+                            <option value="">Seleccione el tipo de alumno</option>
+                            <?php foreach ($tipos_alumno_db as $t): ?>
+                                <option value="<?= htmlspecialchars($t['tipo'] ?? $t['nombre']) ?>"><?= htmlspecialchars($t['tipo'] ?? $t['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="semestre_ingles" class="form-label">Semestre</label>
+                        <select class="form-control bg-dark text-white border-secondary" id="semestre_ingles" name="semestre">
+                            <option value="">Seleccione el semestre (Opcional)</option>
+                            <?php foreach ($semestres_db as $s): ?>
+                                <option value="<?= htmlspecialchars($s['semestre'] ?? $s['numero'] ?? '') ?>"><?= htmlspecialchars($s['semestre'] ?? $s['numero'] ?? '') ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -191,6 +325,10 @@ function limpiarIngles() {
     document.getElementById('formIngles').reset();
     document.getElementById('accionIngles').value = 'guardar';
     document.getElementById('ingles_id').value = '';
+    document.getElementById('carrera_ingles').value = '';
+    document.getElementById('periodo_ingles').value = '';
+    document.getElementById('tipo_alumno_ingles').value = '';
+    document.getElementById('semestre_ingles').value = '';
     document.getElementById('modalTitleIngles').innerText = 'Nueva Solicitud';
 }
 
@@ -201,6 +339,8 @@ function editarIngles(sol) {
     document.getElementById('numero_control_ingles').value = sol.numero_control;
     document.getElementById('carrera_ingles').value = sol.carrera;
     document.getElementById('periodo_ingles').value = sol.periodo;
+    document.getElementById('tipo_alumno_ingles').value = sol.tipo_alumno;
+    document.getElementById('semestre_ingles').value = sol.semestre;
     document.getElementById('modalTitleIngles').innerText = 'Editar Solicitud';
 
     let modal = new bootstrap.Modal(document.getElementById('modalIngles'));

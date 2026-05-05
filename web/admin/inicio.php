@@ -31,7 +31,7 @@ $datos = [
     ],
     "Tramites" => [
         ["Avisos totales - docente", get_count($conexion, "avisos"), "avisos/avisos.php"],
-        ["Solicitudes - Pre registro verano ", get_count($conexion, "VERANO"), "preregistro/preregistro.php"],
+        ["Solicitudes - Pre registro verano ", get_count($conexion, "VERANO"), "solicitudes/preregistro.php"],
         ["Solicitudes - constancias de inglés no inconvenidencia", get_count($conexion, "registro_ingles"), "solicitudes/solicitudes_ingles_constancias.php"],
         ["Solicitudes - cartas de presentacion", get_count($conexion, "solicitudes_cartas_presentacion"), "solicitudes/solicitudes_cartas_presentacion.php"],
         ["Solicitudes - cartas de aceptación", get_count($conexion, "solicitudes_cartas_aceptacion"), "solicitudes/solicitudes_cartas_aceptacion.php"],

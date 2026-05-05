@@ -10,19 +10,32 @@ include("../includes/header.php");
 
 // Lógica de filtrado
 $filtro_n_control = '';
+$filtro_motivo = '';
+$query = "SELECT * FROM justificantes";
+
+$conditions = [];
+
 if (isset($_GET['n_control']) && trim($_GET['n_control']) !== '') {
     $filtro_n_control = $conexion->real_escape_string(trim($_GET['n_control']));
-    $query = "SELECT * FROM justificantes WHERE n_control LIKE '%$filtro_n_control%' ORDER BY fecha_registro DESC";
-} else {
-    $query = "SELECT * FROM justificantes ORDER BY fecha_registro DESC";
+    $conditions[] = "n_control LIKE '%$filtro_n_control%'";
 }
+
+if (isset($_GET['motivo']) && trim($_GET['motivo']) !== '') {
+    $filtro_motivo = $conexion->real_escape_string(trim($_GET['motivo']));
+    $conditions[] = "motivo = '$filtro_motivo'";
+}
+
+if (count($conditions) > 0) {
+    $query .= " WHERE " . implode(" AND ", $conditions);
+}
+
+$query .= " ORDER BY fecha_registro DESC";
 
 $res_justificantes = $conexion->query($query);
 ?>
 <link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>">
 <div class="container py-5">
 
-<link rel="stylesheet" href="../css/estilos.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="../css/tablasS.css">
 
@@ -34,9 +47,6 @@ $res_justificantes = $conexion->query($query);
                 <span class="text-white-50 small">Gestión de justificantes médicos/escolares</span>
             </div>
             <div>
-                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalJustificante" onclick="limpiarFormulario()">
-                    <i class="bi bi-plus-circle me-1"></i> Nuevo
-                </button>
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-house-door me-1"></i> Inicio
                 </a>
@@ -51,15 +61,34 @@ $res_justificantes = $conexion->query($query);
                 <div class="col-auto">
                     <input type="text" id="n_control" name="n_control" class="form-control bg-dark text-white border-secondary" value="<?= htmlspecialchars($filtro_n_control) ?>" placeholder="Escribe el N° Control...">
                 </div>
+
+                <div class="col-auto">
+                    <label for="motivo" class="col-form-label text-white fw-semibold">Filtrar por Motivo:</label>
+                </div>
+                <div class="col-auto">
+                    <select id="motivo" name="motivo" class="form-control bg-dark text-white border-secondary">
+                        <option value="">Todos los motivos</option>
+                        <?php
+                        $motivos_query = "SELECT DISTINCT motivo FROM justificantes WHERE motivo IS NOT NULL AND motivo != '' ORDER BY motivo ASC";
+                        $res_motivos = $conexion->query($motivos_query);
+                        if ($res_motivos) {
+                            while ($m = $res_motivos->fetch_assoc()) {
+                                $selected = ($filtro_motivo === $m['motivo']) ? 'selected' : '';
+                                echo '<option value="' . htmlspecialchars($m['motivo']) . '" ' . $selected . '>' . htmlspecialchars($m['motivo']) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Buscar
                     </button>
-                    <?php if(!empty($filtro_n_control)): ?>
-                        <a href="justificantes.php" class="btn btn-secondary">
-                            <i class="bi bi-x-circle me-1"></i> Limpiar
-                        </a>
-                    <?php endif; ?>
+                    
+                    <a href="justificantes.php" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                    </a>
                 </div>
             </div>
         </form>
@@ -132,10 +161,18 @@ $res_justificantes = $conexion->query($query);
                         <label for="n_control_form" class="form-label">N° de Control</label>
                         <input type="text" class="form-control bg-dark text-white border-secondary" id="n_control_form" name="n_control" required>
                     </div>
+                    
                     <div class="mb-3">
-                        <label for="motivo" class="form-label">Motivo</label>
-                        <textarea class="form-control bg-dark text-white border-secondary" id="motivo" name="motivo" rows="2" required></textarea>
+                        <label class="label-tecnm">MOTIVO</label>
+                        <select name="motivo" id="motivo_form" class="form-select bg-dark text-white border-secondary" required>
+                            <option value="" selected disabled>Seleccione una opción...</option>
+                            <option value="Enfermedad">Enfermedad</option>
+                            <option value="Asuntos Académicos">Asuntos Académicos</option>
+                            <option value="Fuerza Mayor">Fuerza Mayor</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
@@ -146,11 +183,7 @@ $res_justificantes = $conexion->query($query);
                             <input type="date" class="form-control bg-dark text-white border-secondary" id="fecha_fin" name="fecha_fin" required>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="archivo" class="form-label">Archivo de Respaldo</label>
-                        <input type="file" class="form-control bg-dark text-white border-secondary" id="archivo" name="archivo">
                     </div>
-                </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
@@ -205,6 +238,8 @@ function limpiarFormulario() {
     document.getElementById('accion').value = 'guardar';
     document.getElementById('justificante_id').value = '';
     document.getElementById('modalTitle').innerText = 'Nuevo Justificante';
+    // Se restaura el select a la opción por defecto
+    document.getElementById('motivo_form').selectedIndex = 0;
 }
 
 function editarJustificante(jus) {
@@ -212,7 +247,7 @@ function editarJustificante(jus) {
     document.getElementById('justificante_id').value = jus.id;
     document.getElementById('nombre').value = jus.nombre;
     document.getElementById('n_control_form').value = jus.n_control;
-    document.getElementById('motivo').value = jus.motivo;
+    document.getElementById('motivo_form').value = jus.motivo;
     document.getElementById('fecha_inicio').value = jus.fecha_inicio;
     document.getElementById('fecha_fin').value = jus.fecha_fin;
     document.getElementById('modalTitle').innerText = 'Editar Justificante';

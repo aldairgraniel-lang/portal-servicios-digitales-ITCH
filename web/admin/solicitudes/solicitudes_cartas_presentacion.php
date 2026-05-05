@@ -5,12 +5,26 @@ include("../includes/header.php");
 
 // Lógica de filtrado
 $filtro_n_control = '';
+$filtro_tipo_tramite = '';
+$query = "SELECT * FROM solicitudes_cartas_presentacion";
+
+$conditions = [];
+
 if (isset($_GET['numero_control']) && trim($_GET['numero_control']) !== '') {
     $filtro_n_control = $conexion->real_escape_string(trim($_GET['numero_control']));
-    $query = "SELECT * FROM solicitudes_cartas_presentacion WHERE numero_control LIKE '%$filtro_n_control%' ORDER BY fecha_registro DESC";
-} else {
-    $query = "SELECT * FROM solicitudes_cartas_presentacion ORDER BY fecha_registro DESC";
+    $conditions[] = "numero_control LIKE '%$filtro_n_control%'";
 }
+
+if (isset($_GET['tipo_tramite']) && trim($_GET['tipo_tramite']) !== '') {
+    $filtro_tipo_tramite = $conexion->real_escape_string(trim($_GET['tipo_tramite']));
+    $conditions[] = "tipo_tramite = '$filtro_tipo_tramite'";
+}
+
+if (count($conditions) > 0) {
+    $query .= " WHERE " . implode(" AND ", $conditions);
+}
+
+$query .= " ORDER BY fecha_registro DESC";
 
 $res_solicitudes = $conexion->query($query);
 ?>
@@ -29,9 +43,6 @@ $res_solicitudes = $conexion->query($query);
                 <span class="text-white-50 small">Gestión de trámites de presentación</span>
             </div>
             <div>
-                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalPresentacion" onclick="limpiarPresentacion()">
-                    <i class="bi bi-plus-circle me-1"></i> Nuevo
-                </button>
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-house-door me-1"></i> Inicio
                 </a>
@@ -46,15 +57,35 @@ $res_solicitudes = $conexion->query($query);
                 <div class="col-auto">
                     <input type="text" id="numero_control" name="numero_control" class="form-control bg-dark text-white border-secondary" value="<?= htmlspecialchars($filtro_n_control) ?>" placeholder="Escribe el N° Control...">
                 </div>
+                
+                <div class="col-auto">
+                    <label for="tipo_tramite" class="col-form-label text-white fw-semibold">Filtrar por Trámite:</label>
+                </div>
+                <div class="col-auto">
+                    <select id="tipo_tramite" name="tipo_tramite" class="form-control bg-dark text-white border-secondary">
+                        <option value="">Todos los trámites</option>
+                        <?php
+                        // Consulta a la tabla tipos_tramite de la base de datos
+                        $tramites_query = "SELECT nombre_tramite FROM tipos_tramite ORDER BY nombre_tramite ASC";
+                        $res_tramites = $conexion->query($tramites_query);
+                        if ($res_tramites) {
+                            while ($t = $res_tramites->fetch_assoc()) {
+                                $selected = ($filtro_tipo_tramite === $t['nombre_tramite']) ? 'selected' : '';
+                                echo '<option value="' . htmlspecialchars($t['nombre_tramite']) . '" ' . $selected . '>' . htmlspecialchars($t['nombre_tramite']) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Buscar
                     </button>
-                    <?php if(!empty($filtro_n_control)): ?>
-                        <a href="solicitudes_cartas_presentacion.php" class="btn btn-secondary">
-                            <i class="bi bi-x-circle me-1"></i> Limpiar
-                        </a>
-                    <?php endif; ?>
+                    
+                    <a href="solicitudes_cartas_presentacion.php" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                    </a>
                 </div>
             </div>
         </form>
@@ -124,7 +155,20 @@ $res_solicitudes = $conexion->query($query);
                     </div>
                     <div class="mb-3">
                         <label for="tipo_tramite_form" class="form-label">Trámite</label>
-                        <input type="text" class="form-control bg-dark text-white border-secondary" id="tipo_tramite_form" name="tipo_tramite" required>
+                        <select class="form-control bg-dark text-white border-secondary" id="tipo_tramite_form" name="tipo_tramite" required>
+                            <option value="" disabled selected>Seleccione una opción...</option>
+                            <?php
+                            // Carga de opciones desde la tabla tipos_tramite
+                            $tramites_modal_query = "SELECT nombre_tramite FROM tipos_tramite ORDER BY nombre_tramite ASC";
+                            $res_tramites_modal = $conexion->query($tramites_modal_query);
+                            if ($res_tramites_modal && $res_tramites_modal->num_rows > 0) {
+                                while ($t_modal = $res_tramites_modal->fetch_assoc()) {
+                                    $tramite_val = htmlspecialchars($t_modal['nombre_tramite']);
+                                    echo '<option value="' . $tramite_val . '">' . $tramite_val . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer border-secondary">
@@ -188,7 +232,7 @@ function editarPresentacion(sol) {
     document.getElementById('presentacion_id').value = sol.id;
     document.getElementById('nombre_estudiante').value = sol.nombre_estudiante;
     document.getElementById('numero_control_form').value = sol.numero_control;
-    document.getElementById('tipo_tramite_form').value = sol.tipo_tramite;
+    document.getElementById('tipo_tramite_form').value = sol.tipo_tramite; // Selecciona automáticamente la opción
     document.getElementById('modalTitlePresentacion').innerText = 'Editar Solicitud';
 
     let modal = new bootstrap.Modal(document.getElementById('modalPresentacion'));

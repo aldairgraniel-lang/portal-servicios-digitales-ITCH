@@ -1,102 +1,74 @@
 <?php
+// 1. Protección: Solo administradores pueden pasar de aquí.
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
-include($_SERVER['DOCUMENT_ROOT'] . '/conexion.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
-    $accion = $_POST['accion'];
+// 2. Luego incluyes la conexión
+include(__DIR__ . "/../../conexion.php");
 
-    if ($accion === 'eliminar') {
-        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-        if ($id > 0) {
-            $stmt = $conexion->prepare("SELECT archivo FROM solicitudes_cartas_aceptacion WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $stmt->bind_result($archivo);
-            $stmt->fetch();
-            $stmt->close();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $accion = isset($_POST['accion']) ? $_POST['accion'] : '';
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $numero_control = isset($_POST['numero_control']) ? trim($_POST['numero_control']) : '';
+    $tipo_tramite = isset($_POST['tipo_tramite']) ? trim($_POST['tipo_tramite']) : '';
 
-            if ($archivo) {
-                $ruta = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $archivo;
-                if (file_exists($ruta)) {
-                    unlink($ruta);
-                }
-            }
-
-            $stmt = $conexion->prepare("DELETE FROM solicitudes_cartas_aceptacion WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            if ($stmt->execute()) {
-                header("Location: solicitudes_cartas_aceptacion.php?mensaje=eliminado");
-            } else {
-                header("Location: solicitudes_cartas_aceptacion.php?mensaje=error");
-            }
-            $stmt->close();
-        } else {
-            header("Location: solicitudes_cartas_aceptacion.php?mensaje=error");
-        }
-        exit();
-    } 
-    
-    elseif ($accion === 'guardar') {
-        $numero_control = $conexion->real_escape_string($_POST['numero_control']);
-        $tipo_tramite = $conexion->real_escape_string($_POST['tipo_tramite']);
-        $archivo_nombre = '';
-
-        if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
-            $fileTmpPath = $_FILES['archivo']['tmp_name'];
-            $fileName = $_FILES['archivo']['name'];
-            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-            $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/';
-
-            if (!file_exists($uploadFileDir)) {
-                mkdir($uploadFileDir, 0755, true);
-            }
-
-            if (move_uploaded_file($fileTmpPath, $uploadFileDir . $newFileName)) {
-                $archivo_nombre = $newFileName;
-            }
-        }
-
-        $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_aceptacion (numero_control, tipo_tramite, archivo, fecha_registro) VALUES (?, ?, ?, NOW())");
-        $stmt->bind_param("sss", $numero_control, $tipo_tramite, $archivo_nombre);
+    if ($accion === 'guardar') {
+        $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_aceptacion (numero_control, tipo_tramite) VALUES (?, ?)");
+        $stmt->bind_param("ss", $numero_control, $tipo_tramite);
+        
         if ($stmt->execute()) {
+            $stmt->close();
             header("Location: solicitudes_cartas_aceptacion.php?mensaje=guardado");
+            exit();
         } else {
+            $stmt->close();
             header("Location: solicitudes_cartas_aceptacion.php?mensaje=error");
+            exit();
         }
-        $stmt->close();
-        exit();
-    }
-
-    elseif ($accion === 'actualizar') {
-        $id = intval($_POST['id']);
-        $numero_control = $conexion->real_escape_string($_POST['numero_control']);
-        $tipo_tramite = $conexion->real_escape_string($_POST['tipo_tramite']);
-
-        if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
-            $fileTmpPath = $_FILES['archivo']['tmp_name'];
-            $fileName = $_FILES['archivo']['name'];
-            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-            $uploadFileDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/';
-
-            if (move_uploaded_file($fileTmpPath, $uploadFileDir . $newFileName)) {
-                $archivo_nombre = $newFileName;
-                $stmt = $conexion->prepare("UPDATE solicitudes_cartas_aceptacion SET numero_control = ?, tipo_tramite = ?, archivo = ? WHERE id = ?");
-                $stmt->bind_param("sssi", $numero_control, $tipo_tramite, $archivo_nombre, $id);
-            }
-        } else {
-            $stmt = $conexion->prepare("UPDATE solicitudes_cartas_aceptacion SET numero_control = ?, tipo_tramite = ? WHERE id = ?");
-            $stmt->bind_param("ssi", $numero_control, $tipo_tramite, $id);
-        }
-
+    } elseif ($accion === 'actualizar') {
+        $stmt = $conexion->prepare("UPDATE solicitudes_cartas_aceptacion SET numero_control = ?, tipo_tramite = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $numero_control, $tipo_tramite, $id);
+        
         if ($stmt->execute()) {
+            $stmt->close();
             header("Location: solicitudes_cartas_aceptacion.php?mensaje=actualizado");
+            exit();
         } else {
+            $stmt->close();
             header("Location: solicitudes_cartas_aceptacion.php?mensaje=error");
+            exit();
         }
-        $stmt->close();
-        exit();
+    } elseif ($accion === 'eliminar') {
+        // 1. Obtener el nombre del archivo antes de borrar el registro
+        $stmt_select = $conexion->prepare("SELECT archivo_pdf FROM solicitudes_cartas_aceptacion WHERE id = ?");
+        $stmt_select->bind_param("i", $id);
+        $stmt_select->execute();
+        $resultado = $stmt_select->get_result();
+        $fila = $resultado->fetch_assoc();
+        $stmt_select->close();
+
+        if ($fila && !empty($fila['archivo_pdf'])) {
+            $archivo = $fila['archivo_pdf'];
+            $ruta_archivo = __DIR__ . '/../../uploads/' . $archivo; 
+
+            // 2. Eliminar el archivo físico del servidor si existe
+            if (file_exists($ruta_archivo)) {
+                unlink($ruta_archivo);
+            }
+        }
+
+        // 3. Eliminar el registro en la base de datos
+        $stmt_delete = $conexion->prepare("DELETE FROM solicitudes_cartas_aceptacion WHERE id = ?");
+        $stmt_delete->bind_param("i", $id);
+
+        if ($stmt_delete->execute()) {
+            $stmt_delete->close();
+            header("Location: solicitudes_cartas_aceptacion.php?mensaje=eliminado");
+            exit();
+        } else {
+            $stmt_delete->close();
+            header("Location: solicitudes_cartas_aceptacion.php?mensaje=error");
+            exit();
+        }
     }
 }
 ?>

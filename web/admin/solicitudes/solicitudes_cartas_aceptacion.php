@@ -10,12 +10,26 @@ include("../includes/header.php");
 
 // Lógica de filtrado
 $filtro_n_control = '';
+$filtro_tipo_tramite = '';
+$query = "SELECT * FROM solicitudes_cartas_aceptacion";
+
+$conditions = [];
+
 if (isset($_GET['numero_control']) && trim($_GET['numero_control']) !== '') {
     $filtro_n_control = $conexion->real_escape_string(trim($_GET['numero_control']));
-    $query = "SELECT * FROM solicitudes_cartas_aceptacion WHERE numero_control LIKE '%$filtro_n_control%' ORDER BY fecha_registro DESC";
-} else {
-    $query = "SELECT * FROM solicitudes_cartas_aceptacion ORDER BY fecha_registro DESC";
+    $conditions[] = "numero_control LIKE '%$filtro_n_control%'";
 }
+
+if (isset($_GET['tipo_tramite']) && trim($_GET['tipo_tramite']) !== '') {
+    $filtro_tipo_tramite = $conexion->real_escape_string(trim($_GET['tipo_tramite']));
+    $conditions[] = "tipo_tramite = '$filtro_tipo_tramite'";
+}
+
+if (count($conditions) > 0) {
+    $query .= " WHERE " . implode(" AND ", $conditions);
+}
+
+$query .= " ORDER BY fecha_registro DESC";
 
 $res_solicitudes = $conexion->query($query);
 ?>
@@ -34,9 +48,6 @@ $res_solicitudes = $conexion->query($query);
                 <span class="text-white-50 small">Gestión de trámites de aceptación</span>
             </div>
             <div>
-                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalAceptacion" onclick="limpiarAceptacion()">
-                    <i class="bi bi-plus-circle me-1"></i> Nuevo
-                </button>
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-house-door me-1"></i> Inicio
                 </a>
@@ -51,15 +62,34 @@ $res_solicitudes = $conexion->query($query);
                 <div class="col-auto">
                     <input type="text" id="numero_control" name="numero_control" class="form-control bg-dark text-white border-secondary" value="<?= htmlspecialchars($filtro_n_control) ?>" placeholder="Escribe el N° Control...">
                 </div>
+                
+                <div class="col-auto">
+                    <label for="tipo_tramite" class="col-form-label text-white fw-semibold">Filtrar por Trámite:</label>
+                </div>
+                <div class="col-auto">
+                    <select id="tipo_tramite" name="tipo_tramite" class="form-control bg-dark text-white border-secondary">
+                        <option value="">Todos los trámites</option>
+                        <?php
+                        $tramites_query = "SELECT nombre_tramite FROM tipos_tramite ORDER BY nombre_tramite ASC";
+                        $res_tramites = $conexion->query($tramites_query);
+                        if ($res_tramites) {
+                            while ($t = $res_tramites->fetch_assoc()) {
+                                $selected = ($filtro_tipo_tramite === $t['nombre_tramite']) ? 'selected' : '';
+                                echo '<option value="' . htmlspecialchars($t['nombre_tramite']) . '" ' . $selected . '>' . htmlspecialchars($t['nombre_tramite']) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Buscar
                     </button>
-                    <?php if(!empty($filtro_n_control)): ?>
-                        <a href="solicitudes_cartas_aceptacion.php" class="btn btn-secondary">
-                            <i class="bi bi-x-circle me-1"></i> Limpiar
-                        </a>
-                    <?php endif; ?>
+                    
+                    <a href="solicitudes_cartas_aceptacion.php" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                    </a>
                 </div>
             </div>
         </form>
@@ -122,12 +152,19 @@ $res_solicitudes = $conexion->query($query);
                         <input type="text" class="form-control bg-dark text-white border-secondary" id="numero_control_form" name="numero_control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="tipo_tramite" class="form-label">Tipo Trámite</label>
-                        <input type="text" class="form-control bg-dark text-white border-secondary" id="tipo_tramite" name="tipo_tramite" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="archivo_aceptacion" class="form-label">Archivo</label>
-                        <input type="file" class="form-control bg-dark text-white border-secondary" id="archivo_aceptacion" name="archivo">
+                        <label for="tipo_tramite_form" class="form-label">Tipo Trámite</label>
+                        <select class="form-control bg-dark text-white border-secondary" id="tipo_tramite_form" name="tipo_tramite" required>
+                            <option value="">Seleccione un trámite</option>
+                            <?php
+                            $tramites_query_form = "SELECT nombre_tramite FROM tipos_tramite ORDER BY nombre_tramite ASC";
+                            $res_tramites_form = $conexion->query($tramites_query_form);
+                            if ($res_tramites_form) {
+                                while ($t_form = $res_tramites_form->fetch_assoc()) {
+                                    echo '<option value="' . htmlspecialchars($t_form['nombre_tramite']) . '">' . htmlspecialchars($t_form['nombre_tramite']) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer border-secondary">
@@ -159,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
             text = "El registro se creó exitosamente.";
         } else if (mensaje === "actualizado") {
             title = "¡Registro actualizado!";
-            text = "El registro se modificó exitosamente.";
+            text = "El registro se ha actualizado exitosamente.";
         } else if (mensaje === "error") {
             title = "¡Error!";
             text = "Ocurrió un error al procesar los datos.";
@@ -190,7 +227,7 @@ function editarAceptacion(sol) {
     document.getElementById('accionAceptacion').value = 'actualizar';
     document.getElementById('aceptacion_id').value = sol.id;
     document.getElementById('numero_control_form').value = sol.numero_control;
-    document.getElementById('tipo_tramite').value = sol.tipo_tramite;
+    document.getElementById('tipo_tramite_form').value = sol.tipo_tramite;
     document.getElementById('modalTitleAceptacion').innerText = 'Editar Solicitud';
 
     let modal = new bootstrap.Modal(document.getElementById('modalAceptacion'));
