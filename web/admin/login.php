@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="login-subtitle">Divison de Estudios Profesionales.</p>
 
     <hr>Acceso</h3>
-    <p class="login-subtitle">Gestión Administrativa y Docente.</p>
+    <p class="login-subtitle">Gestión  del portal de servicios.</p>
 
     <?php if ($error): ?>
         <div class="alert alert-modern p-2 mb-3">
