@@ -1,0 +1,98 @@
+<?php
+include('../includes/header.php'); 
+include('conexion.php');
+
+// 1. VALIDACIÓN DE ESTADO
+$estado_query = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_presentacion_abierto'");
+$resultado = $estado_query->fetch_assoc();
+$estado = $resultado['valor'] ?? '0'; 
+
+// 2. CARGA DE TRÁMITES
+$query_tramites = "SELECT nombre_tramite FROM tipos_tramite";
+$resultado_tramites = mysqli_query($conexion, $query_tramites);
+?>
+
+<style>
+    /* Estilos unificados para todo el componente */
+    .card-registro { 
+        background: #ffffff; 
+        border-top: 8px solid #9D843E; 
+        border-radius: 15px; 
+        padding: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .label-tecnm { color: #1B396A; font-weight: 700; font-size: 0.85rem; margin-bottom: 5px; display: block; }
+    .btn-tecnm { background: #1B396A; color: white; font-weight: bold; border-radius: 10px; transition: 0.3s; border: none; width: 100%; padding: 10px; text-decoration: none; display: inline-block; }
+        .btn-tecnm:hover { background: #9D843E; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+    .indicaciones-alerta { background-color: #f8f9fa; border-left: 5px solid #1B396A; font-size: 0.85rem; color: #555; }
+    
+    /* Para el estado CERRADO */
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <?php if ($estado !== '1'): ?>
+                    <div class="container d-flex justify-content-center align-items-center">
+                        <div class="tarjeta-glass text-center p-5" style="max-width: 500px; border-top: 5px solid #9D843E;">
+                            <div class="display-1 mb-4">⚠️</div>
+                            <h2 class="titulo" style="color: #fff;">CERRADO</h2>
+                            <p class="text-blanco-puro mt-3">No está disponible actualmente.</p>
+                            <div class="text-center mt-4">
+                                <a href="/index.php" class="boton-servicio text-decoration-none" style="display: inline-block;">VOLVER AL INICIO</a>
+                            </div>
+
+            <?php else: ?>
+                <div class="card-registro">
+                    <h3 class="text-center mb-2" style="color: #1B396A; font-weight: 800;">Solicitud de Carta de Aceptación</h3>
+                    <p class="text-center text-muted small mb-4">Ingrese los datos correspondientes para su trámite</p>
+
+                    <div class="indicaciones-alerta p-3 mb-4 shadow-sm">
+                            <strong>Nota importante:</strong> iniciar con apellidos, luego nombres y mayúsculas.<br>
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> <strong>Formato:</strong> PRESENTACION_N_CONTROL.pdf 
+                    </div>
+
+                    <form id="formCarta" action="guardar_carta_aceptacion.php" method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="label-tecnm">NOMBRE COMPLETO</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Pérez López Juan" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="label-tecnm">NÚMERO DE CONTROL</label>
+                                <input type="text" name="n_control" class="form-control" placeholder="Ej. 19390015" required pattern="[0-9]{8}" maxlength="8">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="label-tecnm">TIPO DE TRÁMITE</label>
+                            <select name="tipo_tramite" class="form-select" required>
+                                <option value="" selected disabled>Seleccione una opción...</option>
+                                <?php
+                                while ($row = mysqli_fetch_assoc($resultado_tramites)) {
+                                    $nombre_t = htmlspecialchars(trim($row['nombre_tramite']), ENT_QUOTES, 'UTF-8');
+                                    echo '<option value="' . $nombre_t . '">' . $nombre_t . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="label-tecnm">NOMBRE DEL ARCHIVO PDF</label>
+                            <input type="text" name="nombre_archivo_previo" class="form-control" placeholder="Ej. PRESENTACION_19390015.pdf" required>
+                            <small class="text-muted">Escriba el nombre exacto del archivo.</small>
+                        </div>
+
+                        <button type="submit" class="btn-tecnm">Finalizar y Enviar</button>
+                        
+                        <div class="text-center mt-4">
+                            <a href="/index.php" class="text-muted text-decoration-none small">← Volver al Inicio</a>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+</div>

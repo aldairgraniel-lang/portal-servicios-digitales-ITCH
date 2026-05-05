@@ -1,21 +1,27 @@
 <?php 
 // 1. Protección de seguridad: Impide el acceso a usuarios no autorizados
-include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 
 // 2. Conexión a la base de datos
-include("../../conexion.php");
-include("../includes/header.php"); 
+include_once("../../conexion.php");
+include_once("../includes/header.php"); 
 
 // Lógica de filtrado por categoría/tipo
 $filtro_tipo = '';
 if (isset($_GET['tipo']) && trim($_GET['tipo']) !== '') {
-    $filtro_tipo = $conexion->real_escape_string(trim($_GET['tipo']));
-    $query = "SELECT * FROM avisos WHERE tipo = '$filtro_tipo' ORDER BY fecha_pub DESC";
+    $filtro_tipo = trim($_GET['tipo']);
+    // Uso de consulta preparada para evitar inyecciones SQL
+    $stmt = $conexion->prepare("SELECT * FROM avisos WHERE tipo = ? ORDER BY fecha_pub DESC");
+    $stmt->bind_param("s", $filtro_tipo);
+    $stmt->execute();
+    $res_avisos = $stmt->get_result();
 } else {
     $query = "SELECT * FROM avisos ORDER BY fecha_pub DESC";
+    $res_avisos = $conexion->query($query);
 }
-
-$res_avisos = $conexion->query($query);
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

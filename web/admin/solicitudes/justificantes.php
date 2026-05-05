@@ -1,6 +1,5 @@
 <?php
 // 1. Protección: Solo administradores pueden pasar de aquí.
-// Al incluir auth.php, validamos sesión y rol automáticamente.
 include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/auth.php');
 
 // 2. Conexión a la base de datos
@@ -20,7 +19,8 @@ if (isset($_GET['n_control']) && trim($_GET['n_control']) !== '') {
 
 $res_justificantes = $conexion->query($query);
 ?>
-<link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>"><div class="container py-5">
+<link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>">
+<div class="container py-5">
 
 <link rel="stylesheet" href="../css/estilos.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -33,9 +33,14 @@ $res_justificantes = $conexion->query($query);
                 <h3 class="fw-bold m-0 text-white"><i class="bi bi-file-earmark-medical me-2"></i>Justificantes</h3>
                 <span class="text-white-50 small">Gestión de justificantes médicos/escolares</span>
             </div>
-            <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                <i class="bi bi-house-door me-1"></i> Inicio
-            </a>
+            <div>
+                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalJustificante" onclick="limpiarFormulario()">
+                    <i class="bi bi-plus-circle me-1"></i> Nuevo
+                </button>
+                <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-house-door me-1"></i> Inicio
+                </a>
+            </div>
         </div>
 
         <form method="GET" class="mb-4 px-2">
@@ -84,6 +89,10 @@ $res_justificantes = $conexion->query($query);
                             </td>
                             <td class="text-white"><?= date('d/m/Y', strtotime($jus['fecha_registro'])) ?></td>
                             <td class="text-end">
+                                <button class="btn btn-sm btn-warning text-white me-1" title="Editar" 
+                                        onclick="editarJustificante(<?= htmlspecialchars(json_encode($jus)) ?>)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                                 <button onclick="eliminarJustificante(<?= $jus['id'] ?>)" class="btn btn-sm btn-danger" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -103,8 +112,115 @@ $res_justificantes = $conexion->query($query);
     </div>
 </div>
 
+<div class="modal fade" id="modalJustificante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modalTitle">Nuevo Justificante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formJustificante" action="procesar_justificantes.php" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="accion" id="accion" value="guardar">
+                    <input type="hidden" name="id" id="justificante_id" value="">
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Estudiante</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="n_control_form" class="form-label">N° de Control</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="n_control_form" name="n_control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">Motivo</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" id="motivo" name="motivo" rows="2" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control bg-dark text-white border-secondary" id="fecha_inicio" name="fecha_inicio" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control bg-dark text-white border-secondary" id="fecha_fin" name="fecha_fin" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Archivo de Respaldo</label>
+                        <input type="file" class="form-control bg-dark text-white border-secondary" id="archivo" name="archivo">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mensaje = urlParams.get('mensaje');
+
+    if (mensaje) {
+        let title = "";
+        let text = "";
+        let icon = "success";
+
+        if (mensaje === "eliminado") {
+            title = "¡Registro eliminado!";
+            text = "El registro ha sido eliminado correctamente.";
+        } else if (mensaje === "guardado") {
+            title = "¡Registro guardado!";
+            text = "El registro se creó exitosamente.";
+        } else if (mensaje === "actualizado") {
+            title = "¡Registro actualizado!";
+            text = "El registro se modificó exitosamente.";
+        } else if (mensaje === "error") {
+            title = "¡Error!";
+            text = "Ocurrió un error al procesar los datos.";
+            icon = "error";
+        }
+
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            background: '#0f172a',
+            color: '#fff',
+            confirmButtonColor: '#3b82f6'
+        }).then(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    }
+});
+
+function limpiarFormulario() {
+    document.getElementById('formJustificante').reset();
+    document.getElementById('accion').value = 'guardar';
+    document.getElementById('justificante_id').value = '';
+    document.getElementById('modalTitle').innerText = 'Nuevo Justificante';
+}
+
+function editarJustificante(jus) {
+    document.getElementById('accion').value = 'actualizar';
+    document.getElementById('justificante_id').value = jus.id;
+    document.getElementById('nombre').value = jus.nombre;
+    document.getElementById('n_control_form').value = jus.n_control;
+    document.getElementById('motivo').value = jus.motivo;
+    document.getElementById('fecha_inicio').value = jus.fecha_inicio;
+    document.getElementById('fecha_fin').value = jus.fecha_fin;
+    document.getElementById('modalTitle').innerText = 'Editar Justificante';
+    
+    let modal = new bootstrap.Modal(document.getElementById('modalJustificante'));
+    modal.show();
+}
+
 function eliminarJustificante(id) {
     Swal.fire({
         title: '¿Eliminar justificante?',
@@ -112,6 +228,7 @@ function eliminarJustificante(id) {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6c757d',
         background: '#0f172a',
         color: '#fff'
     }).then((result) => {

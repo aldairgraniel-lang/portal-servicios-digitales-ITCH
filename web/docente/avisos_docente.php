@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 include(__DIR__ . "/../conexion.php");
 include('includes/auth_docente.php'); // <--- Esto ya hace la magia de bloquear accesos
 
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -39,11 +38,12 @@ function subirArchivo($file) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
     $pagina_actual = isset($_POST['pagina_actual']) ? (int)$_POST['pagina_actual'] : 1;
+    $tipo_filtro_post = $_POST['tipo_filtro'] ?? '';
     $archivo = (isset($_FILES['archivo']) && $_FILES['archivo']['name'] !== '') ? subirArchivo($_FILES['archivo']) : null;
 
     if (isset($_FILES['archivo']) && $_FILES['archivo']['name'] !== '' && $archivo === null) {
         $_SESSION['mensaje'] = "Archivo no permitido ⚠️";
-        header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual);
+        header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual . "&tipo=" . urlencode($tipo_filtro_post));
         exit();
     }
 
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($quedan == 0) {
             header("Location: avisos_docente.php");
         } else {
-            header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual);
+            header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual . "&tipo=" . urlencode($tipo_filtro_post));
         }
         exit();
     }
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual);
+    header("Location: avisos_docente.php?vista=lista&pagina=" . $pagina_actual . "&tipo=" . urlencode($tipo_filtro_post));
     exit();
 }
 
@@ -168,52 +168,120 @@ if ($vista === 'lista') {
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
-    <title>ITCH - Gestion de avisos</title>
+    <title>ITCH - Gestión de Avisos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/avisos.css">
-    
+    <link rel="stylesheet" href="css/avisos.css">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+        .custom-card, .aviso-item-card {
+            background-color: #1a202c !important;
+            border: 1px solid #2d3748;
+            border-radius: 15px;
+        }
+        .aviso-item-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 24px;
+            padding: 24px;
+        }
+        .aviso-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+        .form-control, .form-select {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #475569;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+        }
+        .text-secondary { color: #94a3b8 !important; }
 
+        /* Estilos del botón Checar Lista */
+        .btn-checar-lista {
+            background: rgba(0, 123, 255, 0.25);
+            color: #66b3ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 123, 255, 0.4);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-checar-lista:hover {
+            background: rgba(0, 123, 255, 0.45);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+    </style>
 </head>
 <body>
 <?php include('includes/header.php'); ?>
-<div class="container">
+<div class="container py-4">
 
     <?php if ($vista === 'inicio'): ?>
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card bg-dark border-secondary mb-5" style="border-radius: 15px;">
-                    <div class="card-body p-4">
-                        <header class="d-flex justify-content-between align-items-center mb-5">
+                <div class="card custom-card shadow-lg mb-5">
+                    <div class="card-body p-4 p-md-5">
+                        <header class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
                             <div>
-                                <h5 class="fw-bold text-light">📢 COMUNICAR AVISOS</h5>
-                                <p style="color: #e2e8f0 !important; font-weight: 500; font-size: 1rem; margin-top: 5px; letter-spacing: 0.3px;">
-                                Administra los avisos para la comunidad educativa. Crea mensajes importantes, adjunta archivos relevantes y mantén a todos informados de manera rápida y efectiva. ¡Haz que tus avisos destaquen! 🚀
+                                <h4 class="fw-bold text-light mb-0">📢 COMUNICAR AVISOS</h4>
+                                <p class="text-secondary small mt-1 mb-0" style="letter-spacing: 0.3px;">
+                                    Administra los avisos para la comunidad educativa. Crea mensajes importantes y mantén a todos informados.
                                 </p>
                             </div>
-                            <a href="panel_docente.php" class="btn btn-outline-primary">Regresar</a>
+                            <a href="panel_docente.php" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left"></i> Regresar
+                            </a>
                         </header>
 
-                        <h5 class="text-light fw-bold mb-4">✍️ Crear Nuevo Aviso</h5>
+                        <hr class="border-secondary mb-4">
+
+                        <h5 class="text-light fw-bold mb-3">✍️ Crear Nuevo Aviso</h5>
                         <form method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="accion" value="crear">
-                            <div class="mb-3"><input name="titulo" class="form-control" placeholder="Título del aviso" required></div>
-                            <div class="mb-3"><textarea name="contenido" class="form-control" rows="3" placeholder="Escribe el mensaje aquí..." required></textarea></div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            
+                            <div class="mb-3">
+                                <label class="text-secondary small fw-bold mb-1">Título del aviso</label>
+                                <input name="titulo" class="form-control" placeholder="Escribe el título aquí..." required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="text-secondary small fw-bold mb-1">Contenido</label>
+                                <textarea name="contenido" class="form-control" rows="3" placeholder="Escribe el mensaje detallado aquí..." required></textarea>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold mb-1">Categoría</label>
                                     <select name="tipo" class="form-select">
                                         <option value="info">🔵 Informativo</option>
                                         <option value="advertencia">🟡 Advertencia</option>
                                         <option value="urgente">🔴 Urgente</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold mb-1">Adjuntar archivo (Opcional)</label>
                                     <input type="file" name="archivo" class="form-control">
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success w-100">Publicar Aviso Ahora</button>
+                            
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                                <i class="bi bi-send-fill"></i> Publicar Aviso Ahora
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -224,7 +292,7 @@ if ($vista === 'lista') {
                             📋 Ver Historial de Avisos (<?= $total_avisos ?>)
                         </a>
                     <?php else: ?>
-                        <p style="color: #ffffff !important; font-weight: 700; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.2);">
+                        <p class="text-light fw-bold fs-5" style="text-shadow: 0 0 10px rgba(255,255,255,0.1);">
                             Aún no has publicado avisos. 🚀
                         </p>
                     <?php endif; ?>
@@ -233,91 +301,140 @@ if ($vista === 'lista') {
         </div>
 
     <?php else: ?>
-        <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
             <div>
-                <h5 class="text-light fw-bold m-0">📋 Historial de Avisos</h5><br>
-                                <a href="avisos_docente.php" class="btn btn-outline-primary fw-bold">
+                <h4 class="text-light fw-bold m-0 d-flex align-items-center gap-2">
+                    📋 Historial de Avisos
+                    <span class="badge bg-primary text-white fs-6 align-middle"><?= $total_avisos ?></span>
+                </h4>
+                <br>
+                <a href="avisos_docente.php" class="btn btn-outline-primary fw-bold">
                     <i class="bi bi-arrow-left-circle"></i> Volver al Panel
                 </a>
             </div>
-            <form method="GET" class="d-flex gap-2 align-items-center">
-                <input type="hidden" name="vista" value="lista">
-                <label class="text-secondary small text-nowrap">Filtrar por categoría:</label>
-                <select name="tipo" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-                    <option value="">Todos</option>
-                    <option value="info" <?= $tipo_filtro === 'info' ? 'selected' : '' ?>>🔵 Informativo</option>
-                    <option value="advertencia" <?= $tipo_filtro === 'advertencia' ? 'selected' : '' ?>>🟡 Advertencia</option>
-                    <option value="urgente" <?= $tipo_filtro === 'urgente' ? 'selected' : '' ?>>🔴 Urgente</option>
-                </select>
-            </form>
+            
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+
+
+                <form method="GET" class="d-flex gap-2 align-items-center mb-0">
+                    <input type="hidden" name="vista" value="lista">
+                    <label class="text-secondary small text-nowrap d-none d-sm-block">Filtrar por categoría:</label>
+                    <select name="tipo" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                        <option value="">Todos</option>
+                        <option value="info" <?= $tipo_filtro === 'info' ? 'selected' : '' ?>>🔵 Informativo</option>
+                        <option value="advertencia" <?= $tipo_filtro === 'advertencia' ? 'selected' : '' ?>>🟡 Advertencia</option>
+                        <option value="urgente" <?= $tipo_filtro === 'urgente' ? 'selected' : '' ?>>🔴 Urgente</option>
+                    </select>
+                </form>
+            </div>
         </div>
 
         <?php if ($avisos && $avisos->num_rows > 0): ?>
             <?php while ($row = $avisos->fetch_assoc()): ?>
-                <div class="aviso-item-card p-4">
+                <div class="aviso-item-card shadow-sm">
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
                         <input type="hidden" name="pagina_actual" value="<?= $pagina ?>">
-                        <div class="row g-3">
+                        <input type="hidden" name="tipo_filtro" value="<?= $tipo_filtro ?>">
+                        
+                        <div class="row g-4">
                             <div class="col-md-8">
-                                <input name="titulo" class="form-control fw-bold mb-2" value="<?= htmlspecialchars($row['titulo']) ?>">
-                                <textarea name="contenido" class="form-control mb-2" rows="2"><?= htmlspecialchars($row['contenido']) ?></textarea>
+                                <label class="text-secondary small fw-bold mb-1">Título del aviso</label>
+                                <input name="titulo" class="form-control fw-bold mb-3" value="<?= htmlspecialchars($row['titulo']) ?>" required>
+                                
+                                <label class="text-secondary small fw-bold mb-1">Contenido</label>
+                                <textarea name="contenido" class="form-control mb-2" rows="3" required><?= htmlspecialchars($row['contenido']) ?></textarea>
                             </div>
+
                             <div class="col-md-4">
-                                <select name="tipo" class="form-select mb-2">
-                                    <option value="info" <?= $row['tipo']=='info' ? 'selected' : '' ?>>Info</option>
-                                    <option value="advertencia" <?= $row['tipo']=='advertencia' ? 'selected' : '' ?>>Advertencia</option>
-                                    <option value="urgente" <?= $row['tipo']=='urgente' ? 'selected' : '' ?>>Urgente</option>
+                                <label class="text-secondary small fw-bold mb-1">Categoría</label>
+                                <select name="tipo" class="form-select mb-3">
+                                    <option value="info" <?= $row['tipo']=='info' ? 'selected' : '' ?>>🔵 Informativo</option>
+                                    <option value="advertencia" <?= $row['tipo']=='advertencia' ? 'selected' : '' ?>>🟡 Advertencia</option>
+                                    <option value="urgente" <?= $row['tipo']=='urgente' ? 'selected' : '' ?>>🔴 Urgente</option>
                                 </select>
+
+                                <label class="text-secondary small fw-bold mb-1">Actualizar archivo (opcional)</label>
                                 <input type="file" name="archivo" class="form-control mb-2">
+                                
                                 <?php if ($row['archivo']): ?>
-                                    <a href="../uploads/avisos/<?= $row['archivo'] ?>" target="_blank" class="text-info small">📎 Ver Adjunto</a>
+                                    <div class="mt-1">
+                                        <a href="../uploads/avisos/<?= $row['archivo'] ?>" target="_blank" class="text-info text-decoration-none small">
+                                            <i class="bi bi-paperclip"></i> 📎 Ver archivo actual
+                                        </a>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="d-flex gap-2">
-                                <button type="submit" name="accion" value="editar" class="btn btn-primary btn-sm">💾 Guardar</button>
-                                <span class="badge <?= $row['activo'] ? 'bg-success' : 'bg-danger' ?> pt-2"><?= $row['activo'] ? 'Visible' : 'Oculto' ?></span>
+
+                        <hr class="border-secondary my-3">
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex gap-3 align-items-center">
+                                <button type="submit" name="accion" value="editar" class="btn btn-success btn-sm px-3 py-2 fw-bold">
+                                    <i class="bi bi-floppy"></i> Guardar
+                                </button>
+                                <span class="badge <?= $row['activo'] ? 'bg-success text-white' : 'bg-danger text-white' ?> px-3 py-2">
+                                    <?= $row['activo'] ? '🟢 Visible' : '🔴 Oculto' ?>
+                                </span>
                             </div>
+
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-warning btn-sm" onclick="confirmar(this.form, 'toggle')"><?= $row['activo'] ? 'Ocultar' : 'Mostrar' ?></button>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmar(this.form, 'eliminar')">🗑️</button>
+                                <button type="button" class="btn btn-outline-warning btn-sm px-3 py-2 fw-bold" onclick="confirmar(this.form, 'toggle')">
+                                    <?= $row['activo'] ? 'Ocultar' : 'Mostrar' ?>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm px-3 py-2 fw-bold" onclick="confirmar(this.form, 'eliminar')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <div class="text-center py-5" style="border: 1px dashed var(--text-secondary); border-radius: 20px; background: rgba(255,255,255,0.02);">
-                <h4 style="color: #ffffff !important; font-weight: 800;">No hay avisos registrados.</h4>
-                <p style="color: var(--text-secondary);">Regresa al inicio para crear tu primer aviso o cambia el filtro de categoría.</p>
+            <div class="text-center py-5" style="border: 1px dashed #4a5568; border-radius: 20px; background: rgba(255,255,255,0.01);">
+                <i class="bi bi-card-checklist text-secondary" style="font-size: 3rem;"></i>
+                <h4 class="text-light fw-bold mt-3">No hay avisos registrados.</h4>
+                <p class="text-secondary">Crea tu primer aviso arriba o cambia el filtro de categoría.</p>
             </div>
         <?php endif; ?>
 
         <?php if ($total_paginas > 1): ?>
-            <div class="paginacion-wrapper">
+            <div class="paginacion-wrapper d-flex justify-content-center gap-2 mt-4">
                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                    <a href="?vista=lista&pagina=<?= $i ?><?= !empty($tipo_filtro) ? '&tipo=' . urlencode($tipo_filtro) : '' ?>" class="page-link-btn <?= ($i == $pagina) ? 'activa' : '' ?>"><?= $i ?></a>
+                    <a href="?vista=lista&pagina=<?= $i ?><?= !empty($tipo_filtro) ? '&tipo=' . urlencode($tipo_filtro) : '' ?>" class="btn <?= ($i == $pagina) ? 'btn-primary' : 'btn-outline-secondary' ?> px-3 py-2">
+                        <?= $i ?>
+                    </a>
                 <?php endfor; ?>
             </div>
         <?php endif; ?>
     <?php endif; ?>
+
 </div>
 
 <script>
     function confirmar(form, accion) {
         const config = {
-            toggle: { t: '¿Cambiar visibilidad?', txt: 'El aviso cambiará su estado.', c: '#3b82f6' },
+            toggle: { t: '¿Cambiar visibilidad?', txt: 'El aviso cambiará su estado actual.', c: '#3b82f6' },
             eliminar: { t: '¿Eliminar aviso?', txt: 'Esta acción borrará el registro y el archivo permanentemente.', c: '#ef4444' }
         };
         Swal.fire({
-            title: config[accion].t, text: config[accion].txt, icon: accion === 'eliminar' ? 'warning' : 'info',
-            showCancelButton: true, confirmButtonColor: config[accion].c, background: '#0f172a', color: '#fff', confirmButtonText: 'Confirmar'
+            title: config[accion].t, 
+            text: config[accion].txt, 
+            icon: accion === 'eliminar' ? 'warning' : 'info',
+            showCancelButton: true, 
+            confirmButtonColor: config[accion].c, 
+            background: '#0f172a', 
+            color: '#fff', 
+            confirmButtonText: 'Confirmar'
         }).then((result) => {
             if (result.isConfirmed) {
-                const input = document.createElement('input'); input.type = 'hidden'; input.name = 'accion'; input.value = accion;
-                form.appendChild(input); form.submit();
+                const input = document.createElement('input'); 
+                input.type = 'hidden'; 
+                input.name = 'accion'; 
+                input.value = accion;
+                form.appendChild(input); 
+                form.submit();
             }
         });
     }

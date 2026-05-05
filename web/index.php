@@ -7,32 +7,32 @@
         <div class="titulo text-center mb-5">Portal de Servicios Digitales</div>
         <div class="row g-4 justify-content-center">
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="preregistro.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/preregistro.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>PREREGISTRO VERANO.</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="avisos.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/avisos.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>AVISOS GENERALES.</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="ingles_constancia.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/ingles_constancia.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>CONSTANCIA INGLES NO INCONVENIENCIA.</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="carta_presentacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/carta_presentacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>CARTA DE PRESENTACIÓN.</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="carta_aceptacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/carta_aceptacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>CARTA DE ACEPTACIÓN.</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="justificante.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/justificante.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
                     <span>JUSTIFICANTE.</span>
                 </a>
             </div>
@@ -71,14 +71,19 @@
         </div>
     </div>
 </footer>
-
 <div class="social-sidebar">
     <a href="javascript:void(0)" class="bg-info-btn btn" onclick="mostrarServicios()">
         <i class="fas fa-info-circle"></i>
     </a>
-    <a href="https://www.facebook.com/ITChetumal" class="bg-fb"><i class="fab fa-facebook-f"></i></a>
-    <a href="https://x.com/IT_Chetumal" class="bg-tw"><i class="fab fa-twitter"></i></a>
-    <a href="https://www.youtube.com/channel/UChLQcazFScVKbXtHTY6Ej6A" class="bg-yt"><i class="fab fa-youtube"></i></a>
+    <a href="https://www.facebook.com/ITChetumal" class="bg-fb" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+    <a href="https://x.com/IT_Chetumal" class="bg-tw" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-twitter"></i>
+    </a>
+    <a href="https://www.youtube.com/channel/UChLQcazFScVKbXtHTY6Ej6A" class="bg-yt" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-youtube"></i>
+    </a>
 </div>
 
 <script>
@@ -93,32 +98,32 @@
                     
                     <div style="display: grid; gap: 15px;">
                         
-                        <a href="preregistro.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        <a href="alumno_general/preregistro.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-edit"></i> Prerregistro Verano</div>
                             <div style="font-size: 0.8rem; color: #666;"> Pre-regístrate a los cursos de verano disponibles para regularización o adelantamiento.</div>
                         </a>
 
-                        <a href="avisos.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        <a href="alumno_general/avisos.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-bullhorn"></i> Avisos Generales</div>
                             <div style="font-size: 0.8rem; color: #666;">Consulta comunicados importantes del departamento.</div>
                         </a>
 
-                        <a href="carta_presentacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        <a href="alumno_general/carta_presentacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-file-alt"></i> Carta de Presentación</div>
                             <div style="font-size: 0.8rem; color: #666;">Genera tu carta para iniciar servicio social o residencia profesional.</div>
                         </a>
-                            <a href="carta_aceptacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                            <a href="alumno_general/carta_aceptacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-file-alt"></i> Carta de Aceptación</div>
                             <div style="font-size: 0.8rem; color: #666;">Genera tu carta de aceptación para iniciar servicio social o residencia profesional.</div>
                         </a>
 
                         
-                        <a href="ingles_constancia.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        <a href="alumno_general/ingles_constancia.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-language"></i> Constancia Inglés no inconveniencia </div>
                             <div style="font-size: 0.8rem; color: #666;">Solicita tu constancia de no inconveniencia para llevar acabo el ingles externamente de la institución.</div>
                         </a>
 
-                        <a href="justificante.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        <a href="alumno_general/justificante.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-calendar-times"></i> Justificante</div>
                             <div style="font-size: 0.8rem; color: #666;">Reporta tus inasistencias por motivos médicos,escolares o personales justificados.</div>
                         </a>

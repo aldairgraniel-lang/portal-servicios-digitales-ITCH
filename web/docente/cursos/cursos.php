@@ -37,73 +37,70 @@ if ($edit_mode) {
     
 <?php include('../includes/header.php'); ?>
 
-<div class="wrapper">
+<div class="main-container p-4" style="max-width: 1200px; margin: 0 auto; width: 100%;">
     
-    <main class="main-container p-4" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+    <div class="registration-bar mb-4">
+        <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <h1 class="text-white m-0">Gestión de Cursos</h1>
+            <a href="../panel_docente.php" class="btn btn-outline-primary">Regresar</a>
+        </header>
         
-        <div class="registration-bar mb-4">
-            <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                <h1 class="text-white m-0">Gestión de Cursos</h1>
-                <a href="../panel_docente.php" class="btn btn-outline-primary">Regresar</a>
-            </header>
-            
-            <section class="card bg-dark border-secondary p-4" style="border-radius: 16px; background: #1e293b !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;">
-                <form action="procesar_cursos.php?accion=<?= $edit_mode ? 'actualizar' : 'crear' ?>" method="POST">
-                    <?php if ($edit_mode): ?>
-                        <input type="hidden" name="id" value="<?= htmlspecialchars($edit_data['id']) ?>">
-                    <?php endif; ?>
-                    
-                    <div class="row g-3 align-items-end">
-                        <div class="col-lg-5 col-md-12">
-                            <label class="form-label text-white">Nombre del curso</label>
-                            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($edit_data['nombre'] ?? '') ?>" placeholder="Nombre del curso..." required>
-                        </div>
-
-                        <div class="col-lg-5 col-md-12">
-                            <label class="form-label text-white">Clave del curso</label>
-                            <input type="text" name="clave" class="form-control" value="<?= htmlspecialchars($edit_data['clave'] ?? '') ?>" placeholder="Clave del curso..." required>
-                        </div>
-                        
-                        <div class="col-lg-2 col-md-12">
-                            <div class="d-grid gap-2 w-100">
-                                <button type="submit" class="btn btn-success"><?= $edit_mode ? 'Actualizar' : 'Registrar' ?></button>
-                                <?php if ($edit_mode): ?>
-                                    <a href="cursos.php" class="btn btn-outline-secondary mt-1">Cancelar</a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+        <section class="card bg-dark border-secondary p-4" style="border-radius: 16px; background: #1e293b !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+            <form action="procesar_cursos.php?accion=<?= $edit_mode ? 'actualizar' : 'crear' ?>" method="POST">
+                <?php if ($edit_mode): ?>
+                    <input type="hidden" name="id" value="<?= htmlspecialchars($edit_data['id']) ?>">
+                <?php endif; ?>
+                
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-5 col-md-12">
+                        <label class="form-label text-white">Nombre del curso</label>
+                        <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($edit_data['nombre'] ?? '') ?>" placeholder="Nombre del curso..." required>
                     </div>
-                </form>
-            </section>
-        </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <h2 class="text-white m-0 h4">Lista de Cursos</h2>
-            <div style="max-width: 300px; width: 100%;">
-                <input type="text" id="filtroClave" class="form-control "class="text-white" placeholder="Filtrar por clave... " onkeyup="filtrarCursos()">
-            </div>
-        </div>
-
-        <div class="course-grid">
-            <?php
-            $res = $conexion->query("SELECT * FROM cursos ORDER BY id DESC");
-            while ($row = $res->fetch_assoc()): ?>
-                <div class="course-card shadow-sm">
-                    <h4><?= htmlspecialchars($row['nombre']) ?></h4>
-                    <p class="text-secondary mb-2">Clave: <?= htmlspecialchars($row['clave']) ?></p>
+                    <div class="col-lg-5 col-md-12">
+                        <label class="form-label text-white">Clave del curso</label>
+                        <input type="text" name="clave" class="form-control" value="<?= htmlspecialchars($edit_data['clave'] ?? '') ?>" placeholder="Clave del curso..." required>
+                    </div>
                     
-                    <div class="mt-3 d-flex gap-2">
-                        <a href="cursos.php?editar=<?= $row['id'] ?>" class="btn btn-outline-primary text-white">Editar</a>
-                        <button type="button" class="btn btn-outline-danger" onclick="confirmarEliminar(<?= $row['id'] ?>)">Eliminar</button>
+                    <div class="col-lg-2 col-md-12">
+                        <div class="d-grid gap-2 w-100">
+                            <button type="submit" class="btn btn-success"><?= $edit_mode ? 'Actualizar' : 'Registrar' ?></button>
+                            <?php if ($edit_mode): ?>
+                                <a href="cursos.php" class="btn btn-outline-secondary mt-1">Cancelar</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-            <?php endwhile; ?>
-        </div>
+            </form>
+        </section>
+    </div>
 
-        <div id="mensajeSinResultados" class="text-center text-white mt-4 d-none">
-            No se encontraron cursos que coincidan con la clave.
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="text-white m-0 h4">Lista de Cursos</h2>
+        <div style="max-width: 300px; width: 100%;">
+            <input type="text" id="filtroClave" class="form-control text-white" placeholder="Filtrar por clave..." onkeyup="filtrarCursos()">
         </div>
-    </main>
+    </div>
+
+    <div class="course-grid">
+        <?php
+        $res = $conexion->query("SELECT * FROM cursos ORDER BY id DESC");
+        while ($row = $res->fetch_assoc()): ?>
+            <div class="course-card shadow-sm">
+                <h4><?= htmlspecialchars($row['nombre']) ?></h4>
+                <p class="text-secondary mb-2">Clave: <?= htmlspecialchars($row['clave']) ?></p>
+                
+                <div class="mt-3 d-flex gap-2">
+                    <a href="cursos.php?editar=<?= $row['id'] ?>" class="btn btn-outline-primary text-white">Editar</a>
+                    <button type="button" class="btn btn-outline-danger" onclick="confirmarEliminar(<?= $row['id'] ?>)">Eliminar</button>
+                </div>
+            </div>
+        <?php endwhile; ?>
+    </div>
+
+    <div id="mensajeSinResultados" class="text-center text-white mt-4 d-none">
+        No se encontraron cursos que coincidan con la clave.
+    </div>
 </div>
 
 <script>

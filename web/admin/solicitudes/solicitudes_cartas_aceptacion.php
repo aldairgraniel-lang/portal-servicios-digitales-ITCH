@@ -19,7 +19,8 @@ if (isset($_GET['numero_control']) && trim($_GET['numero_control']) !== '') {
 
 $res_solicitudes = $conexion->query($query);
 ?>
-<link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>"><div class="container py-5">
+<link rel="stylesheet" href="/admin/adminCSS2.css?v=<?php echo time(); ?>">
+<div class="container py-5">
 
 <link rel="stylesheet" href="../css/estilos.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,9 +33,14 @@ $res_solicitudes = $conexion->query($query);
                 <h3 class="fw-bold m-0 text-white"><i class="bi bi-file-earmark-text me-2"></i>Cartas de Aceptación</h3>
                 <span class="text-white-50 small">Gestión de trámites de aceptación</span>
             </div>
-            <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                <i class="bi bi-house-door me-1"></i> Inicio
-            </a>
+            <div>
+                <button class="btn btn-success btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#modalAceptacion" onclick="limpiarAceptacion()">
+                    <i class="bi bi-plus-circle me-1"></i> Nuevo
+                </button>
+                <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-house-door me-1"></i> Inicio
+                </a>
+            </div>
         </div>
 
         <form method="GET" class="mb-4 px-2">
@@ -76,6 +82,10 @@ $res_solicitudes = $conexion->query($query);
                             <td class="text-white"><?= htmlspecialchars($sol['tipo_tramite']) ?></td>
                             <td class="text-white"><?= date('d/m/Y', strtotime($sol['fecha_registro'])) ?></td>
                             <td class="text-end">
+                                <button class="btn btn-sm btn-warning text-white me-1" title="Editar" 
+                                        onclick="editarAceptacion(<?= htmlspecialchars(json_encode($sol)) ?>)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                                 <button onclick="eliminarSolicitud(<?= $sol['id'] ?>)" class="btn btn-sm btn-danger" title="Eliminar solicitud">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -95,8 +105,98 @@ $res_solicitudes = $conexion->query($query);
     </div>
 </div>
 
+<div class="modal fade" id="modalAceptacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modalTitleAceptacion">Nueva Solicitud</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAceptacion" action="procesar_cartas_aceptacion.php" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="accion" id="accionAceptacion" value="guardar">
+                    <input type="hidden" name="id" id="aceptacion_id" value="">
+                    
+                    <div class="mb-3">
+                        <label for="numero_control_form" class="form-label">N° de Control</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="numero_control_form" name="numero_control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_tramite" class="form-label">Tipo Trámite</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="tipo_tramite" name="tipo_tramite" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="archivo_aceptacion" class="form-label">Archivo</label>
+                        <input type="file" class="form-control bg-dark text-white border-secondary" id="archivo_aceptacion" name="archivo">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mensaje = urlParams.get('mensaje');
+
+    if (mensaje) {
+        let title = "";
+        let text = "";
+        let icon = "success";
+
+        if (mensaje === "eliminado") {
+            title = "¡Registro eliminado!";
+            text = "El registro se ha eliminado exitosamente.";
+        } else if (mensaje === "guardado") {
+            title = "¡Registro guardado!";
+            text = "El registro se creó exitosamente.";
+        } else if (mensaje === "actualizado") {
+            title = "¡Registro actualizado!";
+            text = "El registro se modificó exitosamente.";
+        } else if (mensaje === "error") {
+            title = "¡Error!";
+            text = "Ocurrió un error al procesar los datos.";
+            icon = "error";
+        }
+
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            background: '#0f172a',
+            color: '#fff',
+            confirmButtonColor: '#3b82f6'
+        }).then(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    }
+});
+
+function limpiarAceptacion() {
+    document.getElementById('formAceptacion').reset();
+    document.getElementById('accionAceptacion').value = 'guardar';
+    document.getElementById('aceptacion_id').value = '';
+    document.getElementById('modalTitleAceptacion').innerText = 'Nueva Solicitud';
+}
+
+function editarAceptacion(sol) {
+    document.getElementById('accionAceptacion').value = 'actualizar';
+    document.getElementById('aceptacion_id').value = sol.id;
+    document.getElementById('numero_control_form').value = sol.numero_control;
+    document.getElementById('tipo_tramite').value = sol.tipo_tramite;
+    document.getElementById('modalTitleAceptacion').innerText = 'Editar Solicitud';
+
+    let modal = new bootstrap.Modal(document.getElementById('modalAceptacion'));
+    modal.show();
+}
+
 function eliminarSolicitud(id) {
     Swal.fire({
         title: '¿Eliminar registro?',
@@ -104,6 +204,7 @@ function eliminarSolicitud(id) {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6c757d',
         background: '#0f172a',
         color: '#fff'
     }).then((result) => {

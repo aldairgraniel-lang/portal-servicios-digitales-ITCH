@@ -33,7 +33,13 @@
             background: var(--sidebar-bg); 
             border-right: 1px solid var(--border); 
             padding: 20px; 
-            flex-shrink: 0; 
+            flex-shrink: 0;
+            position: fixed; /* Fija la barra lateral */
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 999;
         }
         
         .nav-link { 
@@ -57,9 +63,11 @@
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
+            margin-left: 260px; /* Compensación por el ancho del sidebar */
+            min-height: 100vh;
         }
         
-        /* Diseño único y exclusivo para el Header Superior */
+        /* Diseño para el Header Superior */
         .top-navbar { 
             background: #ff9634d4; 
             backdrop-filter: blur(10px); 
@@ -67,7 +75,12 @@
             padding: 15px 30px; 
             display: flex; 
             justify-content: space-between; 
-            align-items: center; 
+            align-items: center;
+            position: fixed; /* Fija el encabezado */
+            top: 0;
+            left: 260px; /* Deja libre el espacio del sidebar */
+            right: 0;
+            z-index: 1000; /* Mayor índice para que quede por encima */
         }
         
         /* Botón único para el Header */
@@ -85,12 +98,52 @@
             background-color: #dc3545;
             color: #fff;
         }
+
+        main {
+            margin-top: 75px; /* Evita que el contenido superior se oculte detrás del top-navbar */
+            padding: 1.5rem;
+        }
+
+        /* --- Page Loader --- */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #04336c;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.30s ease;
+        }
+
+        .loading-spinner {
+            width: 65px;
+            height: 65px;
+            border: 5px solid #ffffff1a;
+            border-radius: 50%;
+            border-top-color: var(--accent-blue);
+            animation: spin 0.30s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
 
+    <div id="page-loader">
+        <div class="loading-spinner"></div>
+        <h5 class="mt-4 text-white fw-bold">Cargando...</h5>
+    </div>
+
 <?php 
-// 1. Incluyes la configuración primero
 require_once 'config.php'; 
 ?>
 
@@ -113,4 +166,35 @@ require_once 'config.php';
         </a>
     </header>
 
-    <main class="p-4">
+    <main>
+
+    <script>
+        // 1. Ocultar el loader cuando la página termina de cargar con un tiempo mínimo
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            
+            const tiempoMinimo = 0.3 * 1000; // 0.3 segundos
+
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 400);
+            }, tiempoMinimo);
+        });
+
+        // 2. Mostrar el loader al hacer clic en los enlaces de navegación
+        document.querySelectorAll('.nav-link, .top-navbar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href && !href.includes('logout')) {
+                    const loader = document.getElementById('page-loader');
+                    loader.style.display = 'flex';
+                    setTimeout(() => {
+                        loader.style.opacity = '1';
+                    }, 10);
+                }
+            });
+        });
+    </script>
