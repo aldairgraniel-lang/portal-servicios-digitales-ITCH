@@ -2,20 +2,31 @@
 include('../includes/header.php');
 include('conexion.php');
 
+// --- LÓGICA DE FILTRADO ---
+$tipo_filtro = isset($_GET['tipo']) ? trim($_GET['tipo']) : '';
+$sql_filtro = "";
+
+if (!empty($tipo_filtro)) {
+    // Escapamos el tipo para evitar inyecciones SQL
+    $tipo_seguro = $conexion->real_escape_string($tipo_filtro);
+    $sql_filtro = " AND a.tipo = '$tipo_seguro'";
+}
+
 // --- LÓGICA DE PAGINACIÓN ---
 $por_pagina = 5;
 $pagina = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($pagina - 1) * $por_pagina;
 
-// Contar total para calcular páginas
-$total_res = $conexion->query("SELECT COUNT(*) as total FROM avisos WHERE activo = 1");
+// Contar total para calcular páginas (se agrega el alias 'a' a la tabla para evitar el error)
+$sql_count = "SELECT COUNT(*) as total FROM avisos a WHERE a.activo = 1" . $sql_filtro;
+$total_res = $conexion->query($sql_count);
 $total_avisos = $total_res->fetch_assoc()['total'] ?? 0;
 $total_paginas = ceil($total_avisos / $por_pagina);
 
-// Consulta con LIMIT y OFFSET
+// Consulta con LIMIT, OFFSET y filtro aplicado
 $sql = "SELECT a.*, u.usuario AS docente FROM avisos a 
         JOIN usuarios u ON u.id = a.id_docente 
-        WHERE a.activo = 1 ORDER BY a.fecha_registro DESC LIMIT $por_pagina OFFSET $offset";
+        WHERE a.activo = 1 $sql_filtro ORDER BY a.fecha_registro DESC LIMIT $por_pagina OFFSET $offset";
 $result = $conexion->query($sql);
 
 $modales_html = ""; 
@@ -91,10 +102,22 @@ $modales_html = "";
         <div class="row justify-content-center">
             <div class="col-lg-9">
                 
-                <div class="mb-3">
-                    <a href="/index.php" class="btn btn-primary outlined-primary">
-                        Volver al Panel
-                    </a>
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div>
+                        <a href="/index.php" class="btn btn-primary outlined-primary">
+                            Volver al Panel
+                        </a>
+                    </div>
+                    
+                    <form method="GET" class="d-flex gap-2 align-items-center">
+                        <select name="tipo" class="form-select bg-dark text-white border-secondary" style="width: auto;">
+                            <option value="">Todos los avisos</option>
+                            <option value="urgente" <?= (isset($_GET['tipo']) && $_GET['tipo'] === 'urgente') ? 'selected' : '' ?>>🚨 Urgente</option>
+                            <option value="advertencia" <?= (isset($_GET['tipo']) && $_GET['tipo'] === 'advertencia') ? 'selected' : '' ?>>⚠️ Advertencia</option>
+                            <option value="info" <?= (isset($_GET['tipo']) && $_GET['tipo'] === 'info') ? 'selected' : '' ?>>ℹ️ Informativo</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </form>
                 </div>
 
                 <div class="tarjeta-glass rounded-5 shadow-lg">
@@ -169,7 +192,7 @@ $modales_html = "";
                         <?php if ($total_paginas > 1): ?>
                             <div class="d-flex justify-content-center mt-5 gap-2">
                                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                                    <a href="?p=<?= $i ?>" class="btn-paginacion <?= ($pagina == $i) ? 'active' : '' ?>">
+                                    <a href="?p=<?= $i ?><?= !empty($tipo_filtro) ? '&tipo=' . urlencode($tipo_filtro) : '' ?>" class="btn-paginacion <?= ($pagina == $i) ? 'active' : '' ?>">
                                         <?= $i ?>
                                     </a>
                                 <?php endfor; ?>
