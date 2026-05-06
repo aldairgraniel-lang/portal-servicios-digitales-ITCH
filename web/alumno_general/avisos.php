@@ -15,7 +15,7 @@ $total_paginas = ceil($total_avisos / $por_pagina);
 // Consulta con LIMIT y OFFSET
 $sql = "SELECT a.*, u.usuario AS docente FROM avisos a 
         JOIN usuarios u ON u.id = a.id_docente 
-        WHERE a.activo = 1 ORDER BY a.fecha_pub DESC LIMIT $por_pagina OFFSET $offset";
+        WHERE a.activo = 1 ORDER BY a.fecha_registro DESC LIMIT $por_pagina OFFSET $offset";
 $result = $conexion->query($sql);
 
 $modales_html = ""; 
@@ -126,7 +126,7 @@ $modales_html = "";
                                         </div>
 
                                         <p class="mb-0 subtexto-legible">
-                                            📅 <?= date("d/m/Y", strtotime($aviso['fecha_pub'])) ?> • Click para leer
+                                            📅 <?= date("d/m/Y", strtotime($aviso['fecha_registro'])) ?> • Click para leer
                                         </p>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@ $modales_html = "";
                                             <div class="modal-body">
                                                 <div class="mb-4 p-2 rounded bg-dark">
                                                     <span class="text-info small">Publicado por: <b><?= htmlspecialchars($aviso['docente']) ?></b></span><br>
-                                                    <span class="text-secondary small">Fecha: <?= date("d/m/Y", strtotime($aviso['fecha_pub'])) ?></span>
+                                                    <span class="text-secondary small">Fecha: <?= date("d/m/Y", strtotime($aviso['fecha_registro'])) ?></span>
                                                 </div>
                                                 
                                                 <div class="aviso-contenido">

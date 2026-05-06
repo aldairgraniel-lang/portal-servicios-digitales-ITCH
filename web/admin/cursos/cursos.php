@@ -8,22 +8,49 @@ include("../includes/header.php");
 
 $result = mysqli_query($conexion, "SELECT * FROM cursos ORDER BY id ASC");
 ?>
-   <link rel="stylesheet" href="../css/tablasG.css">
+<link rel="stylesheet" href="../css/tablasG.css">
+<style>
+    /* Estilos mejorados para el filtro */
+    .filtro-glass {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-radius: 50px !important;
+        padding: 0.5rem 1.25rem !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        width: 100%;
+        max-width: 250px;
+    }
+    .filtro-glass:focus {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(99, 102, 241, 0.6) !important;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+        outline: 0;
+    }
+    .filtro-glass::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+</style>
 
 <div class="container py-5">
     <div class="glass-card p-4 shadow-lg">
-        <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div class="d-flex justify-content-between align-items-center mb-4 px-2 flex-wrap gap-3">
             <div>
                 <h3 class="fw-bold m-0"><i class="bi bi-book me-2"></i> Gestión de Cursos</h3>
                 <span class="text-white-50 small">Administra los cursos disponibles</span>
             </div>
-            <div class="d-flex gap-2">
-                <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                    <i class="bi bi-arrow-left me-1"></i> Volver
-                </a>
-                <a href="nuevo_curso.php" class="btn btn-primary btn-sm rounded-pill px-3">
-                    <i class="bi bi-plus-lg me-1"></i> Nuevo Curso
-                </a>
+            <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 flex-wrap flex-fill flex-md-grow-0">
+                <input type="text" id="filtroClave" class="form-control filtro-glass" placeholder="Filtrar por clave..." onkeyup="filtrarClave()">
+                <div class="d-flex gap-2">
+                    <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                        <i class="bi bi-arrow-left me-1"></i> Volver
+                    </a>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" onclick="nuevoCurso()">
+                        <i class="bi bi-plus-lg me-1"></i> Nuevo Curso
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -31,6 +58,7 @@ $result = mysqli_query($conexion, "SELECT * FROM cursos ORDER BY id ASC");
             <table class="table align-middle">
                 <thead>
                     <tr>
+                        <th>Clave</th>
                         <th>Nombre del Curso</th>
                         <th class="text-end">Acciones</th>
                     </tr>
@@ -38,10 +66,14 @@ $result = mysqli_query($conexion, "SELECT * FROM cursos ORDER BY id ASC");
                 <tbody>
                 <?php while($row = mysqli_fetch_assoc($result)): ?>
                     <tr>
+                        <td><?= htmlspecialchars($row['clave']) ?></td>
                         <td><?= htmlspecialchars($row['nombre']) ?></td>
                         <td class="text-end">
                             <div class="d-flex gap-2 justify-content-end">
-                                <a href="editar_curso.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">Editar</a>
+                                <button type="button" class="btn btn-primary btn-sm" 
+                                        onclick="editarCurso(<?= $row['id'] ?>, '<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>', '<?= htmlspecialchars($row['clave'], ENT_QUOTES, 'UTF-8') ?>')">
+                                    Editar
+                                </button>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="eliminarCurso(<?= $row['id'] ?>)">
                                     Eliminar
                                 </button>
@@ -57,6 +89,108 @@ $result = mysqli_query($conexion, "SELECT * FROM cursos ORDER BY id ASC");
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+function nuevoCurso() {
+    Swal.fire({
+        title: 'Nuevo Curso',
+        html:
+            '<label class="text-white-50 small" style="display:block; text-align:left; margin-bottom:5px; margin-left:5px;">Nombre del curso</label>' +
+            '<input type="text" id="swal-nombre" class="swal2-input" placeholder="Ingresa el nombre" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:8px; margin-top:0; width: 85%;">' +
+            '<label class="text-white-50 small" style="display:block; text-align:left; margin-top:10px; margin-bottom:5px; margin-left:5px;">Clave del curso</label>' +
+            '<input type="text" id="swal-clave" class="swal2-input" placeholder="Ingresa la clave" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:8px; margin-top:0; width: 85%;">',
+        showCancelButton: true,
+        confirmButtonColor: '#6366f1',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        background: '#0f172a', 
+        color: '#fff',
+        backdrop: 'rgba(0, 0, 0, 0.8)',
+        preConfirm: () => {
+            const nombre = document.getElementById('swal-nombre').value;
+            const clave = document.getElementById('swal-clave').value;
+            if (!nombre || !clave) {
+                Swal.showValidationMessage('¡Los campos no pueden estar vacíos!');
+            }
+            return { nombre: nombre, clave: clave };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.createElement('form');
+            form.action = 'procesar_curso.php';
+            form.method = 'POST';
+
+            let nombreInput = document.createElement('input');
+            nombreInput.type = 'hidden';
+            nombreInput.name = 'nombre';
+            nombreInput.value = result.value.nombre;
+
+            let claveInput = document.createElement('input');
+            claveInput.type = 'hidden';
+            claveInput.name = 'clave';
+            claveInput.value = result.value.clave;
+
+            form.appendChild(nombreInput);
+            form.appendChild(claveInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+function editarCurso(id, nombreActual, claveActual) {
+    Swal.fire({
+        title: 'Editar Curso',
+        html:
+            '<label class="text-white-50 small" style="display:block; text-align:left; margin-bottom:5px; margin-left:5px;">Nombre del curso</label>' +
+            '<input type="text" id="swal-nombre" class="swal2-input" value="' + nombreActual.replace(/"/g, '&quot;') + '" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:8px; margin-top:0; width: 85%;">' +
+            '<label class="text-white-50 small" style="display:block; text-align:left; margin-top:10px; margin-bottom:5px; margin-left:5px;">Clave del curso</label>' +
+            '<input type="text" id="swal-clave" class="swal2-input" value="' + claveActual.replace(/"/g, '&quot;') + '" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:8px; margin-top:0; width: 85%;">',
+        showCancelButton: true,
+        confirmButtonColor: '#6366f1',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Actualizar',
+        cancelButtonText: 'Cancelar',
+        background: '#0f172a', 
+        color: '#fff',
+        backdrop: 'rgba(0, 0, 0, 0.8)',
+        preConfirm: () => {
+            const nombre = document.getElementById('swal-nombre').value;
+            const clave = document.getElementById('swal-clave').value;
+            if (!nombre || !clave) {
+                Swal.showValidationMessage('¡Los campos no pueden estar vacíos!');
+            }
+            return { nombre: nombre, clave: clave };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.createElement('form');
+            form.action = 'procesar_curso.php';
+            form.method = 'POST';
+
+            let idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+
+            let nombreInput = document.createElement('input');
+            nombreInput.type = 'hidden';
+            nombreInput.name = 'nombre';
+            nombreInput.value = result.value.nombre;
+
+            let claveInput = document.createElement('input');
+            claveInput.type = 'hidden';
+            claveInput.name = 'clave';
+            claveInput.value = result.value.clave;
+
+            form.appendChild(idInput);
+            form.appendChild(nombreInput);
+            form.appendChild(claveInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
 function eliminarCurso(id) {
     Swal.fire({
         title: '¿Eliminar curso?',
@@ -64,10 +198,26 @@ function eliminarCurso(id) {
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         confirmButtonText: 'Sí, borrar',
-        background: '#0f172a', color: '#fff'
+        background: '#0f172a', 
+        color: '#fff',
+        backdrop: 'rgba(0, 0, 0, 0.8)'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'eliminar_curso.php?id=' + id;
+            window.location.href = 'procesar_curso.php?action=eliminar&id=' + id;
+        }
+    });
+}
+
+function filtrarClave() {
+    let input = document.getElementById('filtroClave').value.toLowerCase();
+    let filas = document.querySelectorAll('tbody tr');
+    
+    filas.forEach(fila => {
+        let clave = fila.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        if (clave.indexOf(input) > -1) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
         }
     });
 }

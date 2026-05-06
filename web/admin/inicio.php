@@ -5,11 +5,11 @@ include("includes/header.php");
     
 // --- NUEVA SECCIÓN: Mapa de servicios para la limpieza ---
 $servicios_map = [
-    'VERANO' => 'Curso de Verano',
-    'registro_ingles' => 'Constancias de Inglés',
-    'solicitudes_cartas_presentacion' => 'Cartas de Presentación',
-    'solicitudes_cartas_aceptacion' => 'Cartas de Aceptación',
-    'justificantes' => 'Justificantes',
+    'VERANO' => 'Solicitudes de Pre registro verano',
+    'registro_ingles' => 'solicitudes de constancias de inglés no inconvenidencia',
+    'solicitudes_cartas_presentacion' => 'solicitudes de cartas de presentación',
+    'solicitudes_cartas_aceptacion' => 'Solicitudes de Cartas de Aceptación',
+    'justificantes' => 'solicitudes de justificantes',
     'avisos' => 'Avisos'
 ];
 

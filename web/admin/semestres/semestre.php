@@ -8,7 +8,8 @@ include("../includes/header.php");
 
 $result = mysqli_query($conexion, "SELECT * FROM semestres ORDER BY numero ASC");
 ?>
-   <link rel="stylesheet" href="../css/tablasG.css">
+<link rel="stylesheet" href="../css/tablasG.css">
+
 
 <div class="container py-5">
     <div class="glass-card p-4 shadow-lg">
@@ -21,9 +22,9 @@ $result = mysqli_query($conexion, "SELECT * FROM semestres ORDER BY numero ASC")
                 <a href="../inicio.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-arrow-left me-1"></i> Volver
                 </a>
-                <a href="nuevo_semestre.php" class="btn btn-primary btn-sm rounded-pill px-3">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" onclick="nuevoSemestre()">
                     <i class="bi bi-plus-lg me-1"></i> Nuevo Semestre
-                </a>
+                </button>
             </div>
         </div>
 
@@ -40,11 +41,13 @@ $result = mysqli_query($conexion, "SELECT * FROM semestres ORDER BY numero ASC")
                     <tr>
                         <td>Semestre <?= $row['numero'] ?></td>
                         <td class="text-end">
-                            <?php if($row['numero'] >= 13): ?>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarSem(<?= $row['id'] ?>)">
-                                    Eliminar
-                                </button>
-                            <?php endif; ?>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <?php if($row['numero'] > 12): ?>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarSem(<?= $row['id'] ?>)">
+                                        Eliminar
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -56,6 +59,46 @@ $result = mysqli_query($conexion, "SELECT * FROM semestres ORDER BY numero ASC")
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+function nuevoSemestre() {
+    Swal.fire({
+        title: 'Nuevo Semestre',
+        input: 'number',
+        inputLabel: 'Número del semestre',
+        inputPlaceholder: 'Ingresa el número (mayor o igual a 12)',
+        showCancelButton: true,
+        confirmButtonColor: '#6366f1',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        background: '#0f172a', 
+        color: '#fff',
+        backdrop: 'rgba(0, 0, 0, 0.8)',
+        inputValidator: (value) => {
+            if (!value || value.trim() === '') {
+                return '¡El número no puede estar vacío!';
+            }
+            if (parseInt(value) < 12) {
+                return '¡El número debe ser de 12 hacia arriba!';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = document.createElement('form');
+            form.action = 'procesar_semestre.php';
+            form.method = 'POST';
+
+            let numeroInput = document.createElement('input');
+            numeroInput.type = 'hidden';
+            numeroInput.name = 'numero';
+            numeroInput.value = result.value;
+
+            form.appendChild(numeroInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
 function eliminarSem(id) {
     Swal.fire({
         title: '¿Eliminar semestre?',
@@ -63,10 +106,12 @@ function eliminarSem(id) {
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         confirmButtonText: 'Sí, borrar',
-        background: '#0f172a', color: '#fff'
+        background: '#0f172a', 
+        color: '#fff',
+        backdrop: 'rgba(0, 0, 0, 0.8)'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'eliminar_semestre.php?id=' + id;
+            window.location.href = 'procesar_semestre.php?action=eliminar&id=' + id;
         }
     });
 }

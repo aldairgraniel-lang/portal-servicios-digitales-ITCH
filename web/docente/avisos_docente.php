@@ -152,10 +152,10 @@ $offset = ($pagina - 1) * $por_pagina;
 $avisos = null;
 if ($vista === 'lista') {
     if ($tipo_filtro !== '') {
-        $stmt = $conexion->prepare("SELECT * FROM avisos WHERE id_docente = ? AND tipo = ? ORDER BY fecha_pub DESC LIMIT ? OFFSET ?");
+        $stmt = $conexion->prepare("SELECT * FROM avisos WHERE id_docente = ? AND tipo = ? ORDER BY fecha_registro DESC LIMIT ? OFFSET ?");
         $stmt->bind_param("isii", $id_docente, $tipo_filtro, $por_pagina, $offset);
     } else {
-        $stmt = $conexion->prepare("SELECT * FROM avisos WHERE id_docente = ? ORDER BY fecha_pub DESC LIMIT ? OFFSET ?");
+        $stmt = $conexion->prepare("SELECT * FROM avisos WHERE id_docente = ? ORDER BY fecha_registro DESC LIMIT ? OFFSET ?");
         $stmt->bind_param("iii", $id_docente, $por_pagina, $offset);
     }
     $stmt->execute();

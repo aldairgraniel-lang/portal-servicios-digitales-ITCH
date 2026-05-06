@@ -12,8 +12,11 @@ RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 # Forzar UTF-8 en Apache
 RUN echo 'AddDefaultCharset UTF-8' >> /etc/apache2/apache2.conf
 
-# Instalar Composer (copiamos el binario desde la imagen oficial de composer)
+# Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copiar la configuración de PHP
+COPY php.ini /usr/local/etc/php/php.ini
 
 # Copiar solo el contenido de web al DocumentRoot
 COPY web/ /var/www/html/

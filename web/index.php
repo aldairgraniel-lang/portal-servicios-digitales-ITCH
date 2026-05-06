@@ -1,41 +1,97 @@
-<?php include('includes/header.php'); ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
- <link rel="stylesheet" href="css/index.css">
+<?php 
+// Esto DEBE ser lo primero para procesar la sesión
+if (session_status() === PHP_SESSION_NONE) session_start();
+include('includes/header.php'); 
+include('conexion.php');
+
+// Obtener estados actuales de la base de datos
+$estado_verano = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_ingles = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_ingles_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_presentacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_presentacion_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_aceptacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_aceptacion_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_justificantes = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_justificantes_abierto'")->fetch_assoc()['valor'] ?? '0';
+
+$verano_abierto = ($estado_verano === '1');
+$ingles_abierto = ($estado_ingles === '1');
+$presentacion_abierto = ($estado_presentacion === '1');
+$aceptacion_abierto = ($estado_aceptacion === '1');
+$justificantes_abierto = ($estado_justificantes === '1');
+
+$color_primario_abierto = '#04336c';
+$color_aviso_abierto = '#ff7b00';
+$color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="img/imagen1.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITCH - Portal de Servicios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
 <main class="container contenedor-central">
     <div class="tarjeta-glass">
         <div class="titulo text-center mb-5">Portal de Servicios Digitales</div>
         <div class="row g-4 justify-content-center">
+            
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/preregistro.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
-                    <span>PREREGISTRO VERANO.</span>
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/avisos.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="alumno_general/avisos.php" class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" style="background-color: <?= $color_aviso_abierto; ?>;">
                     <span>AVISOS GENERALES.</span>
                 </a>
             </div>
+
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/ingles_constancia.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="<?= $verano_abierto ? 'alumno_general/preregistro.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $verano_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$verano_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$verano_abierto ? 'Servicio Cerrado' : ''; ?>">
+                    <span>PREREGISTRO VERANO.</span>
+                </a>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="<?= $ingles_abierto ? 'alumno_general/ingles_constancia.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $ingles_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$ingles_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$ingles_abierto ? 'Servicio Cerrado' : ''; ?>">
                     <span>CONSTANCIA INGLES NO INCONVENIENCIA.</span>
                 </a>
             </div>
+
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/carta_presentacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="<?= $presentacion_abierto ? 'alumno_general/carta_presentacion.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $presentacion_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$presentacion_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$presentacion_abierto ? 'Servicio Cerrado' : ''; ?>">
                     <span>CARTA DE PRESENTACIÓN.</span>
                 </a>
             </div>
+
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/carta_aceptacion.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="<?= $aceptacion_abierto ? 'alumno_general/carta_aceptacion.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $aceptacion_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$aceptacion_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$aceptacion_abierto ? 'Servicio Cerrado' : ''; ?>">
                     <span>CARTA DE ACEPTACIÓN.</span>
                 </a>
             </div>
+
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="alumno_general/justificante.php" class="btn btn-primary btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center">
+                <a href="<?= $justificantes_abierto ? 'alumno_general/justificante.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $justificantes_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$justificantes_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$justificantes_abierto ? 'Servicio Cerrado' : ''; ?>">
                     <span>JUSTIFICANTE.</span>
                 </a>
             </div>
+
         </div>
     </div>
 </main>
@@ -52,12 +108,12 @@
             <div class="col-12 col-md-3">
                 <h5>Enlaces</h5>
                 <ul class="list-unstyled">
-                    <li><a href="https://www.plataformadetransparencia.org.mx/">Transparencia</a></li>
-                    <li><a href="https://chetumal.tecnm.mx/notas/#">CAMPUS CHETUMAL</a></li>
-                    <li><a href="https://qroo.gob.mx/seq">SEQ</a></li>
-                    <li><a href="https://www.gob.mx/sep">SEP</a></li>
-                    <li><a href="https://www.gob.mx/">GOB FED</a></li>
-                    <li><a href="https://home.inai.org.mx/">INAI</a></li>
+                    <li><a href="https://www.plataformadetransparencia.org.mx/" target="_blank" rel="noopener noreferrer">Transparencia</a></li>
+                    <li><a href="https://chetumal.tecnm.mx/notas/#" target="_blank" rel="noopener noreferrer">CAMPUS CHETUMAL</a></li>
+                    <li><a href="https://qroo.gob.mx/seq" target="_blank" rel="noopener noreferrer">SEQ</a></li>
+                    <li><a href="https://www.gob.mx/sep" target="_blank" rel="noopener noreferrer">SEP</a></li>
+                    <li><a href="https://www.gob.mx/" target="_blank" rel="noopener noreferrer">GOB FED</a></li>
+                    <li><a href="https://home.inai.org.mx/" target="_blank" rel="noopener noreferrer">INAI</a></li>
                 </ul>
             </div>
             <div class="col-12 col-md-5">
@@ -71,6 +127,7 @@
         </div>
     </div>
 </footer>
+
 <div class="social-sidebar">
     <a href="javascript:void(0)" class="bg-info-btn btn" onclick="mostrarServicios()">
         <i class="fas fa-info-circle"></i>
@@ -97,7 +154,6 @@
                     </p>
                     
                     <div style="display: grid; gap: 15px;">
-                        
                         <a href="alumno_general/preregistro.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-edit"></i> Prerregistro Verano</div>
                             <div style="font-size: 0.8rem; color: #666;"> Pre-regístrate a los cursos de verano disponibles para regularización o adelantamiento.</div>
@@ -112,11 +168,11 @@
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-file-alt"></i> Carta de Presentación</div>
                             <div style="font-size: 0.8rem; color: #666;">Genera tu carta para iniciar servicio social o residencia profesional.</div>
                         </a>
-                            <a href="alumno_general/carta_aceptacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
+                        
+                        <a href="alumno_general/carta_aceptacion.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-file-alt"></i> Carta de Aceptación</div>
                             <div style="font-size: 0.8rem; color: #666;">Genera tu carta de aceptación para iniciar servicio social o residencia profesional.</div>
                         </a>
-
                         
                         <a href="alumno_general/ingles_constancia.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-language"></i> Constancia Inglés no inconveniencia </div>
@@ -125,9 +181,8 @@
 
                         <a href="alumno_general/justificante.php" style="text-decoration: none; color: inherit; display: block; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00aaff;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-calendar-times"></i> Justificante</div>
-                            <div style="font-size: 0.8rem; color: #666;">Reporta tus inasistencias por motivos médicos,escolares o personales justificados.</div>
+                            <div style="font-size: 0.8rem; color: #666;">Reporta tus inasistencias por motivos médicos, escolares o personales justificados.</div>
                         </a>
-
                     </div>
                 </div>
             `,
