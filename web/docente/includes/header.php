@@ -1,6 +1,3 @@
-<?php
-// header.php
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -145,6 +142,11 @@
 
 <?php 
 require_once 'config.php'; 
+
+// Nos aseguramos de que la sesión esté iniciada para leer variables de sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <aside class="sidebar">
@@ -160,7 +162,14 @@ require_once 'config.php';
 
 <div class="wrapper">
     <header class="top-navbar">
-        <span class="text-white"></span>
+        <span class="text-white fs-5 fw-semibold">
+            👤 Bienvenido(a): 
+            <?php 
+                // Asegúrate de que el nombre de la variable coincida con la que definiste al iniciar sesión.
+                // Usamos $_SESSION['usuario'] como ejemplo común.
+                echo isset($_SESSION['usuario']) ? htmlspecialchars($_SESSION['usuario']) : 'Invitado'; 
+            ?>
+        </span>
         <a href="<?php echo BASE_URL2; ?>logout.php" class="btn btn-outline-danger logout-btn">
             🔐 Cerrar Sesión
         </a>

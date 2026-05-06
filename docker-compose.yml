@@ -1,30 +1,33 @@
-version: '3.8'
+version: '3.8' # Versión del formato del archivo Docker Compose
 
 services:
+  # Servicio del servidor web (PHP / Apache o Nginx)
   web:
-    build: .
+    build: . # Construye la imagen utilizando el Dockerfile del directorio actual
     ports:
-      - "8080:80"
+      - "8080:80" # Mapea el puerto 8080 de tu máquina local al puerto 80 del contenedor
     volumes:
-      - ./web:/var/www/html
-      - ./php.ini:/usr/local/etc/php/php.ini  # <--- Agrega esta línea
+      - ./web:/var/www/html # Sincroniza la carpeta local de código con el directorio web del contenedor
+      - ./php.ini:/usr/local/etc/php/php.ini # Sobrescribe la configuración de PHP con la local personalizada
     depends_on:
-      - db
+      - db # Indica que este servicio debe esperar a que el contenedor de la base de datos esté listo
 
+  # Servicio del motor de base de datos
   db:
-    image: mysql:8
-    restart: always
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    image: mysql:8 # Utiliza la imagen oficial de MySQL en su versión 8
+    restart: always # Asegura que el contenedor se reinicie automáticamente si se detiene
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # Configura la base de datos para soportar caracteres especiales y emojis
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: servicios
-      MYSQL_USER: user
-      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: root # Contraseña del usuario administrador (root)
+      MYSQL_DATABASE: servicios # Crea automáticamente esta base de datos al iniciar
+      MYSQL_USER: user # Crea un usuario adicional para la conexión de la app
+      MYSQL_PASSWORD: user # Contraseña del usuario adicional
     ports:
-      - "3306:3306"
+      - "3306:3306" # Expone el puerto de la base de datos para conexiones desde el host o herramientas como Workbench
     volumes:
-      - db_data:/var/lib/mysql
-      - ./db:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql # Almacena los datos de la base de datos de forma persistente
+      - ./db:/docker-entrypoint-initdb.d # Ejecuta automáticamente los scripts .sql que estén en la carpeta ./db
 
+# Definición de volúmenes persistentes
 volumes:
-  db_data:
+  db_data: # Volumen nombrado para asegurar que los datos de MySQL no se pierdan al destruir el contenedor

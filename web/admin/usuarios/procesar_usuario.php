@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($accion === 'editar' && $id > 0) {
         if (!empty($password)) {
-            // Actualizar con contraseña encriptada
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            // Actualizar con contraseña encriptada en MD5
+            $hashed_password = md5($password);
             $stmt = $conexion->prepare("UPDATE usuarios SET usuario=?, password=?, rol=? WHERE id=?");
             $stmt->bind_param("sssi", $usuario, $hashed_password, $rol, $id);
         } else {
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     } elseif ($accion === 'agregar') {
         if (!empty($password)) {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $hashed_password = md5($password);
             $stmt = $conexion->prepare("INSERT INTO usuarios (usuario, password, rol) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $usuario, $hashed_password, $rol);
             $stmt->execute();

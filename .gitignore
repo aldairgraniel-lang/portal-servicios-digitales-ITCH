@@ -1,4 +1,11 @@
+# Dependencias de PHP (Composer)
 vendor/
+
+# Dependencias de Node.js (npm/yarn)
 node_modules/
+
+# Variables de entorno y credenciales sensibles
 .env
+
+# Archivos de configuración local de Docker Compose
 docker-compose.override.yml

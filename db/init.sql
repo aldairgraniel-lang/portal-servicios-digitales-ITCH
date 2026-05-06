@@ -104,10 +104,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   password VARCHAR(255) NOT NULL,
   rol ENUM('admin','docente') NOT NULL DEFAULT 'docente'
 );
-
 INSERT IGNORE INTO usuarios (id, usuario, password, rol) VALUES
-(1,'admin', MD5('123456'), 'admin'),
-(2,'docente', MD5('123456'), 'docente');
+(1, 'admin', '$2y$10$4O6cM1Q7a2k5hK3.k7M0vu9...', 'admin'),
+(2, 'docente', '$2y$10$4O6cM1Q7a2k5hK3.k7M0vu9...', 'docente');
 
 -- =========================
 -- PERIODOS

@@ -99,7 +99,7 @@
     }
 
     .bg-info-btn {
-        background: #eeff0000;
+        background: #ff7b00;
         border-radius: 0%;
     }
 
@@ -114,5 +114,5 @@
     }
 
     .bg-info-btn:hover i {
-        color: #ffea00;
+        color: #ff7b00;
     }
