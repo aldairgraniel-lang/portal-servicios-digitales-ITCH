@@ -1,11 +1,8 @@
 <?php 
 if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Asegurar que el script se detenga si los archivos no existen
 require_once(__DIR__ . "/../../conexion.php");
 require_once(__DIR__ . "/../includes/auth_docente.php");
 
-// Lógica para detectar si estamos editando
 $edit_mode = isset($_GET['editar']);
 $edit_data = ['id' => '', 'nombre' => '', 'clave' => ''];
 
@@ -19,34 +16,30 @@ if ($edit_mode) {
         $edit_data = $row;
     }
 }
-include('../includes/header.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="../img/Imagen1.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ITCH - <?= $edit_mode ? 'Editar Curso' : 'Gestión de Cursos' ?></title> 
-    <link rel="icon" href="/docente/img/Imagen1.png" type="image/x-icon">
+    <link rel="icon" href="../img/Imagen1.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <link rel="stylesheet" href="../css/cursos.css">
 </head>
 <body>
-    
 
-
-<div class="main-container p-4" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+<?php include('../includes/header.php'); ?>
+<div class="main-container p-4">
     
-    <div class="registration-bar mb-4">
+    <div class="registration-bar">
         <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h1 class="text-white m-0">Gestión de Cursos</h1>
             <a href="../panel_docente.php" class="btn btn-outline-primary">Regresar</a>
         </header>
         
-        <section class="card bg-dark border-secondary p-4" style="border-radius: 16px; background: #1e293b !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+        <section>
             <form action="procesar_cursos.php?accion=<?= $edit_mode ? 'actualizar' : 'crear' ?>" method="POST">
                 <?php if ($edit_mode): ?>
                     <input type="hidden" name="id" value="<?= htmlspecialchars($edit_data['id']) ?>">
@@ -55,19 +48,25 @@ include('../includes/header.php');
                 <div class="row g-3 align-items-end">
                     <div class="col-lg-5 col-md-12">
                         <label class="form-label text-white">Nombre del curso</label>
-                        <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($edit_data['nombre'] ?? '') ?>" placeholder="Nombre del curso..." required>
+                        <input type="text" name="nombre" class="form-control" 
+                               value="<?= htmlspecialchars($edit_data['nombre'] ?? '') ?>" 
+                               placeholder="Ej. Programación Web" required>
                     </div>
 
                     <div class="col-lg-5 col-md-12">
                         <label class="form-label text-white">Clave del curso</label>
-                        <input type="text" name="clave" class="form-control" value="<?= htmlspecialchars($edit_data['clave'] ?? '') ?>" placeholder="Clave del curso..." required>
+                        <input type="text" name="clave" class="form-control" 
+                               value="<?= htmlspecialchars($edit_data['clave'] ?? '') ?>" 
+                               placeholder="Ej. INF-102" required>
                     </div>
                     
                     <div class="col-lg-2 col-md-12">
-                        <div class="d-grid gap-2 w-100">
-                            <button type="submit" class="btn btn-success"><?= $edit_mode ? 'Actualizar' : 'Registrar' ?></button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <?= $edit_mode ? 'Actualizar' : 'Registrar' ?>
+                            </button>
                             <?php if ($edit_mode): ?>
-                                <a href="cursos.php" class="btn btn-outline-secondary mt-1">Cancelar</a>
+                                <a href="cursos.php" class="btn btn-outline-secondary">Cancelar</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -79,7 +78,8 @@ include('../includes/header.php');
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <h2 class="text-white m-0 h4">Lista de Cursos</h2>
         <div style="max-width: 300px; width: 100%;">
-            <input type="text" id="filtroClave" class="form-control text-white" placeholder="Filtrar por clave..." onkeyup="filtrarCursos()">
+            <input type="text" id="filtroClave" class="form-control" 
+                   placeholder="Buscar por clave..." onkeyup="filtrarCursos()">
         </div>
     </div>
 
@@ -89,11 +89,12 @@ include('../includes/header.php');
         while ($row = $res->fetch_assoc()): ?>
             <div class="course-card shadow-sm">
                 <h4><?= htmlspecialchars($row['nombre']) ?></h4>
-                <p class="text-secondary mb-2">Clave: <?= htmlspecialchars($row['clave']) ?></p>
+                <p class="text-secondary mb-2">Clave: <strong><?= htmlspecialchars($row['clave']) ?></strong></p>
                 
                 <div class="mt-3 d-flex gap-2">
-                    <a href="cursos.php?editar=<?= $row['id'] ?>" class="btn btn-outline-primary text-white">Editar</a>
-                    <button type="button" class="btn btn-outline-danger" onclick="confirmarEliminar(<?= $row['id'] ?>)">Eliminar</button>
+                    <a href="cursos.php?editar=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary text-white">Editar</a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                            onclick="confirmarEliminar(<?= $row['id'] ?>)">Eliminar</button>
                 </div>
             </div>
         <?php endwhile; ?>
@@ -127,14 +128,14 @@ include('../includes/header.php');
 
     // 2. Función para filtrar los cursos por clave
     function filtrarCursos() {
-        var input, filter, cards, p, txtValue, visibleCount = 0;
-        input = document.getElementById('filtroClave');
-        filter = input.value.toUpperCase();
-        cards = document.getElementsByClassName('course-card');
+        let input = document.getElementById('filtroClave');
+        let filter = input.value.toUpperCase();
+        let cards = document.getElementsByClassName('course-card');
+        let visibleCount = 0;
         
-        for (var i = 0; i < cards.length; i++) {
-            p = cards[i].getElementsByTagName("p")[0];
-            txtValue = p.textContent || p.innerText;
+        for (let i = 0; i < cards.length; i++) {
+            let p = cards[i].getElementsByTagName("p")[0];
+            let txtValue = p.textContent || p.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 cards[i].style.display = "";
                 visibleCount++;
@@ -143,15 +144,11 @@ include('../includes/header.php');
             }
         }
 
-        var msg = document.getElementById('mensajeSinResultados');
-        if (visibleCount === 0 && filter !== "") {
-            msg.classList.remove('d-none');
-        } else {
-            msg.classList.add('d-none');
-        }
+        let msg = document.getElementById('mensajeSinResultados');
+        msg.classList.toggle('d-none', visibleCount !== 0 || filter === "");
     }
 
-    // 3. Notificaciones Toast (se ejecutan automáticamente al cargar si hay mensaje)
+    // 3. Notificaciones Toast
     document.addEventListener("DOMContentLoaded", function() {
         <?php if (isset($_SESSION['mensaje'])): ?>
             Swal.fire({
@@ -165,7 +162,7 @@ include('../includes/header.php');
                 background: '#1e293b',
                 color: '#fff'
             });
-            <?php unset($_SESSION['mensaje']); // Limpiamos el mensaje tras mostrarlo ?>
+            <?php unset($_SESSION['mensaje']); ?>
         <?php endif; ?>
     });
 </script>
