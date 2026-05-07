@@ -1,0 +1,62 @@
+    .tarjeta-glass {
+        background: rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        padding: 30px;
+    }
+
+    .aviso-item {
+        background: rgba(255, 255, 255, 0.07) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .aviso-item:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .texto-legible {
+        color: #ffffff !important;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .subtexto-legible {
+        color: rgba(255, 255, 255, 0.75) !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-content {
+        background: #121212 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    .aviso-contenido {
+        color: #f0f0f0 !important;
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    .btn-paginacion {
+        padding: 8px 16px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        transition: 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-paginacion:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: #00e5ff;
+        border-color: #00e5ff;
+    }
+
+    .btn-paginacion.active {
+        background: #00e5ff;
+        color: black;
+        font-weight: bold;
+    }

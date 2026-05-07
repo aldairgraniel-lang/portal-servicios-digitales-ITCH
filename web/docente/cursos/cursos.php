@@ -19,6 +19,7 @@ if ($edit_mode) {
         $edit_data = $row;
     }
 }
+include('../includes/header.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -35,7 +36,7 @@ if ($edit_mode) {
 </head>
 <body>
     
-<?php include('../includes/header.php'); ?>
+
 
 <div class="main-container p-4" style="max-width: 1200px; margin: 0 auto; width: 100%;">
     

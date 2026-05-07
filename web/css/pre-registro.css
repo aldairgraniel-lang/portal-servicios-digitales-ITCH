@@ -1,0 +1,65 @@
+   .btn-tecnm {
+       background: #1B396A;
+       color: white;
+       font-weight: bold;
+       border-radius: 10px;
+       transition: 0.3s;
+       border: none;
+       width: 100%;
+       padding: 10px;
+       text-decoration: none;
+       display: inline-block;
+   }
+
+   .btn-tecnm:hover {
+       background: #9D843E;
+       color: white;
+       transform: translateY(-2px);
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+   }
+
+   /* Estilos mejorados para los botones */
+   .reg-verano__btn-submit,
+   .reg-verano__btn-rep {
+       display: inline-block;
+       padding: 12px 25px;
+       font-weight: 600;
+       text-align: center;
+       text-decoration: none;
+       border-radius: 8px;
+       transition: all 0.3s ease;
+       border: none;
+       cursor: pointer;
+       font-size: 1rem;
+   }
+
+   .reg-verano__btn-submit {
+       background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+       color: #ffffff;
+       width: 100%;
+       box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+   }
+
+   .reg-verano__btn-submit:hover {
+       background: linear-gradient(135deg, #0b5ed7, #0a4bb4);
+       transform: translateY(-2px);
+       box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+   }
+
+   .reg-verano__btn-submit:disabled {
+       background: #cccccc;
+       cursor: not-allowed;
+       transform: none;
+   }
+
+   .reg-verano__btn-rep {
+       background-color: transparent;
+       border: 2px solid #0d6efd;
+       color: #0d6efd;
+   }
+
+   .reg-verano__btn-rep:hover {
+       background-color: #0d6efd;
+       color: #ffffff;
+       transform: translateY(-2px);
+   }

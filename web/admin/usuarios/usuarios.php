@@ -7,30 +7,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php');
 $result = $conexion->query("SELECT * FROM usuarios ORDER BY id ASC");
 ?>
 <link rel="stylesheet" href="../css/tablasG.css">
-<style>
-    /* Estilos mejorados para el filtro */
-    .filtro-glass {
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #ffffff !important;
-        border-radius: 50px !important;
-        padding: 0.5rem 1.25rem !important;
-        transition: all 0.3s ease !important;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        width: 100%;
-        max-width: 250px;
-    }
-    .filtro-glass:focus {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border-color: rgba(99, 102, 241, 0.6) !important;
-        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
-        outline: 0;
-    }
-    .filtro-glass::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-</style>
+<link rel="stylesheet" href="../css/filtroUsuario.css">
 
 <div class="container py-5">
     <div class="glass-card p-4 shadow-lg">

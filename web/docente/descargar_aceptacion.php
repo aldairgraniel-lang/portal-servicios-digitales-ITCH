@@ -45,36 +45,7 @@ header("Pragma: no-cache");
 header("Expires: 0");
 echo "\xEF\xBB\xBF"; 
 ?>
-<style>
-    /* Estilos base */
-    body { font-family: 'Segoe UI', Arial, sans-serif; }
-    table { border-collapse: collapse; width: 100%; }
-    
-    /* Tus clases originales preservadas */
-    .header { 
-        background-color: #0f172a; 
-        color: #ffffff; 
-        font-weight: bold; 
-        text-align: center; 
-        padding: 12px;
-        font-size: 14px;
-    }
-    .border { 
-        border: 1px solid #cbd5e1; 
-        padding: 8px; 
-    }
-
-    /* Mejora visual: Zebra stripes */
-    tbody tr:nth-child(even) { background-color: #f8fafc; }
-    
-    /* Estilo para la fecha de reporte */
-    .meta-info {
-        font-size: 12px;
-        color: #003c91;
-        margin-bottom: 10px;
-        text-align: right;
-    }
-</style>
+<link rel="stylesheet" href="css/S_aceptacion.css">
 
 <div class="meta-info">
     Fecha de reporte: <?php echo date('d/m/Y H:i:s'); ?>

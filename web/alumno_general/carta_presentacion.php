@@ -18,14 +18,7 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitud de Carta de Presentación</title>
-    <style>
-        .card-registro { background: rgba(255, 255, 255, 0.98); border-top: 8px solid #9D843E; border-radius: 15px; }
-        .label-tecnm { color: #1B396A; font-weight: bold; }
-        .btn-tecnm { background: #1B396A; color: white; font-weight: bold; border-radius: 10px; transition: 0.3s; border: none; width: 100%; padding: 10px; text-decoration: none; display: inline-block; text-align: center; }
-        .btn-tecnm:hover { background: #9D843E; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .indicaciones-alerta { background-color: #f8f9fa; border-left: 5px solid #1B396A; font-size: 0.85rem; color: #555; }
-        .form-control:focus, .form-select:focus { border-color: #1B396A; box-shadow: 0 0 0 0.25rem rgba(27, 57, 106, 0.1); }
-    </style>
+    <link rel="stylesheet" href="../css/presentacion.css">
 </head>
 <body> 
 

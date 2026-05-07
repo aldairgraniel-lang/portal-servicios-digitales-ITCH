@@ -1,0 +1,62 @@
+       body {
+           background-color: #0b0f19;
+           color: #e2e8f0;
+       }
+
+       .custom-card,
+       .aviso-item-card {
+           background-color: #1a202c !important;
+           border: 1px solid #2d3748;
+           border-radius: 15px;
+       }
+
+       .aviso-item-card {
+           background-color: #1e293b;
+           border: 1px solid #334155;
+           border-radius: 12px;
+           transition: transform 0.2s, box-shadow 0.2s;
+           margin-bottom: 24px;
+           padding: 24px;
+       }
+
+       .aviso-item-card:hover {
+           transform: translateY(-3px);
+           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+       }
+
+       .form-control,
+       .form-select {
+           background-color: #0f172a;
+           color: #f8fafc;
+           border-color: #475569;
+       }
+
+       .form-control:focus,
+       .form-select:focus {
+           background-color: #0f172a;
+           color: #f8fafc;
+           border-color: #3b82f6;
+           box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+       }
+
+       .text-secondary {
+           color: #94a3b8 !important;
+       }
+
+       /* Estilos del botón Checar Lista */
+       .btn-checar-lista {
+           background: rgba(0, 123, 255, 0.25);
+           color: #66b3ff;
+           padding: 8px 16px;
+           border-radius: 6px;
+           border: 1px solid rgba(0, 123, 255, 0.4);
+           font-size: 0.9rem;
+           transition: all 0.3s ease;
+           cursor: pointer;
+       }
+
+       .btn-checar-lista:hover {
+           background: rgba(0, 123, 255, 0.45);
+           color: #ffffff;
+           box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+       }
