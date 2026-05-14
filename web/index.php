@@ -10,13 +10,14 @@ $estado_verano = $conexion->query("SELECT valor FROM configuracion WHERE clave =
 $estado_ingles = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_ingles_abierto'")->fetch_assoc()['valor'] ?? '0';
 $estado_presentacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_presentacion_abierto'")->fetch_assoc()['valor'] ?? '0';
 $estado_aceptacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_aceptacion_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_terminacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_terminacion_abierto'")->fetch_assoc()['valor'] ?? '0';
 $estado_justificantes = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_justificantes_abierto'")->fetch_assoc()['valor'] ?? '0';
-
 // Asigna variables booleanas a cada estado para evaluar su disponibilidad
 $verano_abierto = ($estado_verano === '1');
 $ingles_abierto = ($estado_ingles === '1');
 $presentacion_abierto = ($estado_presentacion === '1');
 $aceptacion_abierto = ($estado_aceptacion === '1');
+$terminacion_abierto = ($estado_terminacion === '1');
 $justificantes_abierto = ($estado_justificantes === '1');
 
 // Definición de colores base para los botones
@@ -31,6 +32,7 @@ $color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
     <link rel="icon" href="img/imagen1.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ITCH - Portal de Servicios</title>
+    <script src="[https://cdn.jsdelivr.net/npm/sweetalert2@11](https://cdn.jsdelivr.net/npm/sweetalert2@11)"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -85,6 +87,26 @@ $color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
                     <span>CARTA DE ACEPTACIÓN.</span>
                 </a>
             </div>
+
+<div class="col-12 col-md-6 col-lg-4">
+    <?php if ($terminacion_abierto): ?> <!-- CAMBIADO AQUÍ -->
+        <!-- BOTÓN ACTIVO CON ALERTA -->
+        <a href="javascript:void(0);" 
+           onclick="confirmarInterno()"
+           class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+           style="background-color: <?= $color_primario_abierto ?>;">
+            <span>CARTA DE TERMINACIÓN.</span>
+        </a>
+    <?php else: ?>
+        <!-- BOTÓN DESHABILITADO -->
+        <a href="javascript:void(0);" 
+           class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+           style="background-color: <?= $color_cerrado ?>; cursor: not-allowed; opacity: 0.7;"
+           title="Servicio Cerrado">
+            <span>CARTA DE TERMINACIÓN.</span>
+        </a>
+    <?php endif; ?>
+</div>          
 
             <div class="col-12 col-md-6 col-lg-4">
                 <a href="<?= $justificantes_abierto ? 'alumno_general/justificante.php' : 'javascript:void(0);'; ?>" 
@@ -188,6 +210,11 @@ $color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
                         </div>
                         
                         <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
+                            <div style="font-weight: bold; color: #00264d;"><i class="fas fa-language"></i> cartas de terminacion</div>
+                            <div style="font-size: 0.8rem; color: #555;">Solicita tu carta de terminacion solo si eres.</div>
+                        </div>
+
+                        <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-language"></i> Constancia Inglés no inconveniencia</div>
                             <div style="font-size: 0.8rem; color: #555;">Solicita tu constancia de no inconveniencia para llevar a cabo el inglés externamente de la institución.</div>
                         </div>
@@ -210,3 +237,31 @@ $color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
 
 </body>
 </html>
+<script>
+function confirmarInterno() {
+    Swal.fire({
+        title: '<strong>Confirmación de Acceso</strong>',
+        icon: 'info',
+        html: `
+        
+            <div style="text-align: center;">
+                <p>Este registro es <b>exclusivamente</b> para alumnos del instituto que realizaron su trámite como <b>estudiantes INTERNOS</b>.</p>
+                <hr>
+                <p class="small text-muted">¿Deseas continuar con el registro?</p>
+            </div>
+        `,
+        showCancelButton: true,
+        focusConfirm: false,
+        confirmButtonText: '<i class="bi bi-check-lg"></i> Sí, soy interno',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#1B396A', // Azul institucional
+        cancelButtonColor: '#d33',
+        heightAuto: false, // Evita saltos visuales
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Redirige al formulario si confirma
+            window.location.href = 'alumno_general/carta_terminacion.php';
+        }
+    });
+}
+</script>

@@ -9,11 +9,12 @@ $servicios_map = [
     'registro_ingles' => 'solicitudes de constancias de inglés no inconvenidencia',
     'solicitudes_cartas_presentacion' => 'solicitudes de cartas de presentación',
     'solicitudes_cartas_aceptacion' => 'Solicitudes de Cartas de Aceptación',
+    'solicitudes_cartas_terminacion' => 'Solicitudes de Cartas de Terminación',
     'justificantes' => 'solicitudes de justificantes',
     'avisos' => 'Avisos'
 ];
 
-// 2. Funciones
+// 2. FuncionesA
 function get_count($conexion, $tabla) {
     $query = mysqli_query($conexion, "SELECT COUNT(*) as total FROM $tabla");
     return mysqli_fetch_assoc($query)['total'] ?? 0;
@@ -35,6 +36,7 @@ $datos = [
         ["Solicitudes - constancias de inglés no inconvenidencia", get_count($conexion, "registro_ingles"), "solicitudes/solicitudes_ingles_constancias.php"],
         ["Solicitudes - cartas de presentacion", get_count($conexion, "solicitudes_cartas_presentacion"), "solicitudes/solicitudes_cartas_presentacion.php"],
         ["Solicitudes - cartas de aceptación", get_count($conexion, "solicitudes_cartas_aceptacion"), "solicitudes/solicitudes_cartas_aceptacion.php"],
+        ["Solicitudes - cartas de terminación", get_count($conexion, "solicitudes_cartas_terminacion"), "solicitudes/solicitudes_cartas_terminacion.php"],
         ["Solicitudes - justificantes", get_count($conexion, "justificantes"), "solicitudes/justificantes.php"]
     ]
 ];

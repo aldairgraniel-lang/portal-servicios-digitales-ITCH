@@ -7,7 +7,11 @@ include(__DIR__ . "/../conexion.php");
 // 1. Obtener filtros
 $filtro_nc      = isset($_GET['nc']) ? trim($_GET['nc']) : '';
 $filtro_periodo = isset($_GET['periodo']) ? trim($_GET['periodo']) : '';
-$filtro_fecha   = isset($_GET['fecha']) ? $_GET['fecha'] : '';
+$fecha_inicio   = isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : '';
+$fecha_fin      = isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : '';
+
+// Variable para determinar si se ha iniciado una búsqueda
+$busqueda_activa = !empty($_GET);
 
 // 2. Construcción de consulta dinámica
 $condiciones = [];
@@ -26,27 +30,43 @@ if ($filtro_periodo != '') {
     $types .= "s";
 }
 
-if ($filtro_fecha != '') {
-    $condiciones[] = "DATE(fecha_registro) = ?";
-    $params[] = $filtro_fecha;
+// Filtro de rango de fechas
+if ($fecha_inicio != '' && $fecha_fin != '') {
+    $condiciones[] = "DATE(fecha_registro) BETWEEN ? AND ?";
+    $params[] = $fecha_inicio;
+    $params[] = $fecha_fin;
+    $types .= "ss";
+} elseif ($fecha_inicio != '') {
+    $condiciones[] = "DATE(fecha_registro) >= ?";
+    $params[] = $fecha_inicio;
+    $types .= "s";
+} elseif ($fecha_fin != '') {
+    $condiciones[] = "DATE(fecha_registro) <= ?";
+    $params[] = $fecha_fin;
     $types .= "s";
 }
 
-$sql = "SELECT * FROM registro_ingles";
-if (count($condiciones) > 0) {
-    $sql .= " WHERE " . implode(" AND ", $condiciones);
-}
-$sql .= " ORDER BY periodo DESC, nombre ASC";
+$alumnos = null;
+$hayResultados = false;
 
-$stmt = $conexion->prepare($sql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$alumnos = $stmt->get_result();
-$hayResultados = ($alumnos && $alumnos->num_rows > 0);
+// SOLO ejecutar la consulta si hay una búsqueda activa
+if ($busqueda_activa) {
+    $sql = "SELECT * FROM registro_ingles";
+    if (count($condiciones) > 0) {
+        $sql .= " WHERE " . implode(" AND ", $condiciones);
+    }
+    $sql .= " ORDER BY periodo DESC, nombre ASC";
 
-// Cargar periodos para el select
+    $stmt = $conexion->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $alumnos = $stmt->get_result();
+    $hayResultados = ($alumnos && $alumnos->num_rows > 0);
+}
+
+// Cargar periodos para el select (esto siempre se carga para el filtro)
 $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORDER BY MAX(id) DESC");
 ?>
 
@@ -60,8 +80,7 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <link rel="stylesheet" href="css/tablasCSS.css">
-
+    <link rel="stylesheet" href="css/tablasCSS.css">
 </head>
 <body>
     <div class="container py-5">
@@ -72,18 +91,14 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
             </div>
 
             <form method="GET" class="row g-3 mb-4 align-items-end">
-                <div class="col-md-4">
-                    <label class="text-light fw-bold">N° Control:</label>
-                    <div class="input-group">
-                        <input type="text" name="nc" class="form-control" placeholder="ej: 19390015" value="<?= htmlspecialchars($filtro_nc) ?>">
-                        <button type="submit" class="btn btn-info"><i class="bi bi-search"></i></button>
-                        <a href="<?= basename($_SERVER['PHP_SELF']) ?>" class="btn btn-outline-secondary fw-bold"><i class="bi bi-arrow-clockwise"></i></a>
-                    </div>
+                <div class="col-md-3">
+                    <label class="text-light fw-bold small">N° Control:</label>
+                    <input type="text" name="nc" class="form-control" placeholder="ej: 19390015" value="<?= htmlspecialchars($filtro_nc) ?>">
                 </div>
 
                 <div class="col-md-3">
-                    <label class="text-light fw-bold">Periodo:</label>
-                    <select name="periodo" class="form-control" onchange="this.form.submit()">
+                    <label class="text-light fw-bold small">Periodo:</label>
+                    <select name="periodo" class="form-select">
                         <option value="">Todos los periodos</option>
                         <?php if ($periodos_db): while($p = $periodos_db->fetch_assoc()): ?>
                             <option value="<?= htmlspecialchars($p['nombre']) ?>" <?= $filtro_periodo == $p['nombre'] ? 'selected' : '' ?>>
@@ -94,16 +109,27 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
                 </div>
 
                 <div class="col-md-2">
-                    <label class="text-light fw-bold">Fecha:</label>
-                    <input type="date" name="fecha" class="form-control" value="<?= htmlspecialchars($filtro_fecha) ?>" onchange="this.form.submit()">
+                    <label class="text-light fw-bold small">Desde:</label>
+                    <input type="date" name="fecha_inicio" class="form-control" value="<?= htmlspecialchars($fecha_inicio) ?>">
                 </div>
 
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-2">
+                    <label class="text-light fw-bold small">Hasta:</label>
+                    <input type="date" name="fecha_fin" class="form-control" value="<?= htmlspecialchars($fecha_fin) ?>">
+                </div>
+
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-info w-100 fw-bold"><i class="bi bi-funnel"></i> Filtrar</button>
+                    <a href="<?= basename($_SERVER['PHP_SELF']) ?>" class="btn btn-outline-secondary fw-bold"><i class="bi bi-arrow-clockwise"></i></a>
+                </div>
+                
+                <div class="col-12 mt-3 d-flex gap-2 justify-content-center">
                     <button type="button" 
                             onclick="<?= $hayResultados ? "window.location.href='exportar_excel_ingles.php?".http_build_query($_GET)."'" : "alertaVacia()" ?>" 
-                            class="btn btn-success w-30 fw-bold"><i class="bi bi-file-earmark-excel"></i> Excel grupal</button>
-                            <a href="generar_constancias_ingles.php" class="btn btn-warning w-30 fw-bold"><i class="bi bi-download"></i>  pdf por alumno</a>
-                        </div>
+                            class="btn btn-success fw-bold px-4"><i class="bi bi-file-earmark-excel me-1"></i> Excel Grupal</button>
+                    
+                    <a href="generar_constancias_ingles.php" class="btn btn-warning fw-bold px-4"><i class="bi bi-download me-1"></i> PDF Individual</a>
+                </div>
             </form>
 
             <div class="table-responsive">
@@ -118,7 +144,9 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($hayResultados): while($a = $alumnos->fetch_assoc()): ?>
+                        <?php if (!$busqueda_activa): ?>
+                            <tr><td colspan="5" class="text-center p-5 text-light"><i class="bi bi-funnel fs-1 d-block mb-2 text-light"></i>Seleccione los filtros y presione "Filtrar" para ver los datos.</td></tr>
+                        <?php elseif ($hayResultados): while($a = $alumnos->fetch_assoc()): ?>
                             <tr>
                                 <td class="text-warning fw-bold"><?= htmlspecialchars($a['numero_control']) ?></td>
                                 <td><?= htmlspecialchars($a['nombre']) ?></td>
@@ -132,7 +160,7 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
                                 </td>
                             </tr>
                         <?php endwhile; else: ?>
-                            <tr><td colspan="5" class="text-center p-5">No se encontraron registros.</td></tr>
+                            <tr><td colspan="5" class="text-center p-5">No se encontraron registros con esos criterios.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -145,9 +173,10 @@ $periodos_db = $conexion->query("SELECT nombre FROM periodos GROUP BY nombre ORD
             Swal.fire({
                 icon: 'info',
                 title: 'Sin registros',
-                text: 'No hay datos para exportar.',
+                text: 'No hay datos en pantalla para exportar.',
                 confirmButtonColor: '#198754',
-                backdrop: false
+                background: '#1e293b',
+                color: '#fff'
             });
         }
     </script>

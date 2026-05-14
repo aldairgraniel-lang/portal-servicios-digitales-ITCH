@@ -1,5 +1,6 @@
 version: '3.8' # Versión del formato del archivo Docker Compose
-
+environment:
+  - TZ=America/Cancun
 services:
   # Servicio del servidor web (PHP / Apache o Nginx)
   web:

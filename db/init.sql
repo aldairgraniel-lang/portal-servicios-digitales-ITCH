@@ -21,6 +21,7 @@ INSERT IGNORE INTO configuracion (clave, valor) VALUES
 ('registro_ingles_abierto', '0'),
 ('registro_presentacion_abierto', '0'),
 ('registro_aceptacion_abierto', '0'),
+('registro_terminacion_abierto', '0'),
 ('registro_justificantes_abierto', '0');
 
 -- =========================
@@ -62,7 +63,6 @@ INSERT IGNORE INTO carreras (nombre) VALUES
 CREATE TABLE IF NOT EXISTS semestres (
   id INT AUTO_INCREMENT PRIMARY KEY,
   numero INT NOT NULL
-  
 );
 
 INSERT IGNORE INTO semestres (numero) VALUES
@@ -81,7 +81,7 @@ INSERT IGNORE INTO tipo_estudiante (nombre) VALUES
 ('Cursando semestre');
 
 -- =========================
--- CURSOS
+-- CURSOS (Corregido para incluir 'clave')
 -- =========================
 CREATE TABLE IF NOT EXISTS cursos (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,14 +90,14 @@ CREATE TABLE IF NOT EXISTS cursos (
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO cursos (nombre) VALUES
-('Curso de Verano - Matemáticas'),
-('Curso de Verano - Física'),
-('Curso de Verano - Programación');
+INSERT IGNORE INTO cursos (nombre, clave) VALUES
+('Curso de Verano - Matemáticas', 'MAT-VER-01'),
+('Curso de Verano - Física', 'FIS-VER-01'),
+('Curso de Verano - Programación', 'PROG-VER-01');
 
 -- =========================
 -- USUARIOS
--- 1. Crear la tabla con espacio suficiente para cualquier hash
+-- =========================
 CREATE TABLE IF NOT EXISTS usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario VARCHAR(50) NOT NULL UNIQUE,
@@ -105,21 +105,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
   rol ENUM('admin','docente') NOT NULL DEFAULT 'docente'
 );
 
--- 2. Insertar usuarios con MD5 limpio (sin espacios accidentales)
 INSERT IGNORE INTO usuarios (id, usuario, password, rol) VALUES
 (1, 'admin', MD5('123456'), 'admin'),
 (2, 'docente', MD5('123456'), 'docente');
---UPDATE usuarios SET password = MD5('123456');
 
-
-
-
-
-
-
-
-
-
+-- =========================
 -- PERIODOS
 -- =========================
 CREATE TABLE IF NOT EXISTS periodos (
@@ -196,7 +186,7 @@ CREATE TABLE IF NOT EXISTS registro_ingles (
 -- =========================
 CREATE TABLE IF NOT EXISTS solicitudes_cartas_presentacion (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_estudiante VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
     numero_control VARCHAR(20) NOT NULL,
     tipo_tramite VARCHAR(100) NOT NULL,
     archivo_pdf VARCHAR(255) NOT NULL,
@@ -210,6 +200,18 @@ CREATE TABLE IF NOT EXISTS solicitudes_cartas_aceptacion (
     archivo_pdf VARCHAR(255) DEFAULT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================
+-- CARTA DE TERMINACION (Corregida)
+-- =========================
+CREATE TABLE IF NOT EXISTS solicitudes_cartas_terminacion (
+    id_terminacion INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    n_control VARCHAR(8) NOT NULL,
+    tipo_tramite ENUM('Servicio Social', 'Residencia Profesional') NOT NULL,
+    nombre_archivo_aceptacion VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- =========================
 -- JUSTIFICANTES

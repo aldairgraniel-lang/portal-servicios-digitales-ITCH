@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 3. Insertar en la base de datos
     $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_presentacion 
-        (nombre_estudiante, numero_control, tipo_tramite, archivo_pdf) 
+        (nombre, numero_control, tipo_tramite, archivo_pdf) 
         VALUES (?, ?, ?, ?)");
 
     $stmt->bind_param("ssss", $nombre, $n_control, $tipo, $nombre_archivo_final);

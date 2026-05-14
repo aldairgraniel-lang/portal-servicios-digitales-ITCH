@@ -1,69 +1,49 @@
 <?php
-// Esto DEBE ser lo primero para procesar el POST antes de cualquier salida
+// 1. LÓGICA DE PROCESAMIENTO (Mantenida intacta)
 if (session_status() === PHP_SESSION_NONE) session_start();
 include('includes/auth_docente.php');
 include(__DIR__ . "/../conexion.php");
 
 if (isset($_POST['toggle'])) {
     if (!isset($_POST['tipo_registro'])) exit('Solicitud inválida');
-
     $tipo = $_POST['tipo_registro'];
-    $permitidos = [
-        'registro_abierto',
-        'registro_ingles_abierto',
-        'registro_presentacion_abierto',
-        'registro_aceptacion_abierto',
-        'registro_justificantes_abierto'
-    ];
-
+    $permitidos = ['registro_abierto', 'registro_ingles_abierto', 'registro_presentacion_abierto', 'registro_aceptacion_abierto', 'registro_terminacion_abierto', 'registro_justificantes_abierto'];
     if (!in_array($tipo, $permitidos)) exit('Acceso no permitido');
-
     $stmt = $conexion->prepare("SELECT valor FROM configuracion WHERE clave = ?");
     $stmt->bind_param("s", $tipo);
     $stmt->execute();
     $resultado = $stmt->get_result()->fetch_assoc();
-
     if ($resultado) {
         $nuevo = ($resultado['valor'] === '1') ? '0' : '1';
         $stmt = $conexion->prepare("UPDATE configuracion SET valor = ? WHERE clave = ?");
         $stmt->bind_param("ss", $nuevo, $tipo);
         $stmt->execute();
-
-        // 1. Detección de petición AJAX (Fetch API) para no recargar la página
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'nuevo_estado' => $nuevo
-            ]);
+            echo json_encode(['success' => true, 'nuevo_estado' => $nuevo]);
             exit;
         }
     }
-    
-    // Si no es petición AJAX (ej. JS desactivado), recarga normal
     header("Location: panel_docente.php");
     exit;
 }
 
-// Obtener estados actuales
-$estado_verano = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_abierto'")->fetch_assoc()['valor'] ?? '0';
-$estado_ingles = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_ingles_abierto'")->fetch_assoc()['valor'] ?? '0';
-$estado_presentacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_presentacion_abierto'")->fetch_assoc()['valor'] ?? '0';
-$estado_aceptacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_aceptacion_abierto'")->fetch_assoc()['valor'] ?? '0';
-$estado_justificantes = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_justificantes_abierto'")->fetch_assoc()['valor'] ?? '0';
+// 2. DEFINICIÓN DE MÓDULOS
+$config_modulos = [
+    ['label' => 'Preregistro Verano', 'url' => 'preregistro.php', 'icon' => '📋', 'clave' => 'registro_abierto', 'tabla' => 'VERANO'],
+    ['label' => 'Inglés No Inconveniencia', 'url' => 'solicitudes_ingles.php', 'icon' => '📑', 'clave' => 'registro_ingles_abierto', 'tabla' => 'registro_ingles'],
+    ['label' => 'Carta Presentación', 'url' => 'solicitudes_presentacion.php', 'icon' => '📄', 'clave' => 'registro_presentacion_abierto', 'tabla' => 'solicitudes_cartas_presentacion'],
+    ['label' => 'Carta Aceptación', 'url' => 'solicitudes_aceptacion.php', 'icon' => '📄', 'clave' => 'registro_aceptacion_abierto', 'tabla' => 'solicitudes_cartas_aceptacion'],
+    ['label' => 'Carta Terminación', 'url' => 'solicitudes_terminacion.php', 'icon' => '📄', 'clave' => 'registro_terminacion_abierto', 'tabla' => 'solicitudes_cartas_terminacion'],
+    ['label' => 'Justificantes', 'url' => 'solicitudes_justificantes.php', 'icon' => '📝', 'clave' => 'registro_justificantes_abierto', 'tabla' => 'justificantes'],
+];
 
-// OBTENCIÓN DE CONTADORES
-$count_verano = $conexion->query("SELECT COUNT(*) as total FROM VERANO")->fetch_assoc()['total'] ?? 0;
-$count_ingles = $conexion->query("SELECT COUNT(*) as total FROM registro_ingles")->fetch_assoc()['total'] ?? 0;
-$count_presentacion = $conexion->query("SELECT COUNT(*) as total FROM solicitudes_cartas_presentacion")->fetch_assoc()['total'] ?? 0;
-$count_aceptacion = $conexion->query("SELECT COUNT(*) as total FROM solicitudes_cartas_aceptacion")->fetch_assoc()['total'] ?? 0;
-$count_justificantes = $conexion->query("SELECT COUNT(*) as total FROM justificantes")->fetch_assoc()['total'] ?? 0;
-
-$verano_abierto = ($estado_verano === '1');
-$ingles_abierto = ($estado_ingles === '1');
-$presentacion_abierto = ($estado_presentacion === '1');
-$aceptacion_abierto = ($estado_aceptacion === '1');
-$justificantes_abierto = ($estado_justificantes === '1');
+$modulos_finales = [];
+foreach ($config_modulos as $m) {
+    $est = $conexion->query("SELECT valor FROM configuracion WHERE clave = '{$m['clave']}'")->fetch_assoc()['valor'] ?? '0';
+    $cnt = $conexion->query("SELECT COUNT(*) as total FROM {$m['tabla']}")->fetch_assoc()['total'] ?? 0;
+    $modulos_finales[] = array_merge($m, ['abierto' => ($est === '1'), 'conteo' => $cnt]);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -71,102 +51,203 @@ $justificantes_abierto = ($estado_justificantes === '1');
     <meta charset="UTF-8">
     <link rel="icon" href="img/imagen1.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITCH - División de Estudios Profesionales</title>
+    <title>ITCH - DEP Control Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/panel.css">
+    <style>
+        :root {
+            --glass-bg: rgba(30, 41, 59, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #3b82f6;
+        }
+
+        body { 
+            background: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        .dashboard-container { max-width: 1000px; margin: 2rem auto; padding: 0 15px; }
+        
+        .header-section { margin-bottom: 2.5rem; }
+        .header-section h1 { font-weight: 800; font-size: calc(1.3rem + 1vw); }
+        .header-section p { color: #94a3b8; }
+
+        /* Isla de Control con Adaptabilidad */
+        .isla-control {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            flex-wrap: wrap; /* Permite que los elementos bajen en pantallas pequeñas */
+            gap: 15px;
+        }
+
+        .isla-control:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .info-principal { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex: 1; 
+            min-width: 250px; /* Evita que el texto se aplaste demasiado */
+        }
+        
+        .icon-box {
+            font-size: 1.25rem;
+            min-width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .titulo-modulo { font-weight: 600; font-size: 0.95rem; margin: 0; }
+        
+        .badge-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .acciones { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            justify-content: flex-end;
+        }
+
+        /* Ajustes para móviles */
+        @media (max-width: 576px) {
+            .isla-control {
+                padding: 1rem;
+                justify-content: center;
+                text-align: center;
+            }
+            .info-principal {
+                flex-direction: column;
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+            .acciones {
+                width: 100%;
+                justify-content: space-around;
+                border-top: 1px solid var(--glass-border);
+                padding-top: 15px;
+            }
+            .status-text { text-align: left !important; }
+        }
+
+        .btn-gestionar {
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .btn-gestionar:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+        .form-check-input { width: 2.5em !important; height: 1.25em !important; cursor: pointer; }
+        
+        .status-text { 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            font-weight: 800; 
+            min-width: 55px;
+            text-align: right;
+        }
+        .text-open { color: #10b981; }
+        .text-closed { color: #64748b; }
+    </style>
 </head>
 <body>
 <?php include('includes/header.php'); ?>
 
-<div class="panel-header mb-4">
-    <h1>División de Estudios Profesionales</h1>
-    <p>Gestión de servicios escolares y procesos académicos.</p>
-</div>
-
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    <?php 
-    $items = [
-        ['preregistro - verano', 'preregistro.php', '📄', $count_verano, $verano_abierto, 'registro_abierto'],
-        ['solicitudes - Inglés no inconveniencia', 'solicitudes_ingles.php', '📄', $count_ingles, $ingles_abierto, 'registro_ingles_abierto'],
-        ['solicitudes - Carta Presentación', 'solicitudes_presentacion.php', '📄', $count_presentacion, $presentacion_abierto, 'registro_presentacion_abierto'],
-        ['solicitudes - Carta Aceptación', 'solicitudes_aceptacion.php', '📄', $count_aceptacion, $aceptacion_abierto, 'registro_aceptacion_abierto'],
-        ['solicitudes - Justificantes', 'solicitudes_justificantes.php', '📝', $count_justificantes, $justificantes_abierto, 'registro_justificantes_abierto']
-    ];
-
-    foreach($items as $i): ?>
-    <div class="col">
-        <div class="card-modern shadow-sm">
-            <?php if($i[3] > 0): ?>
-                <span class="notification-badge"><?= $i[3] ?></span>
-            <?php endif; ?>
-            
-            <a href="<?= $i[1] ?>" class="card-link text-white">
-                <div class="fs-2 mb-2"><?= $i[2] ?></div>
-                <h5 class="fw-bold mb-2" style="font-size: 1.15rem;"><?= htmlspecialchars($i[0]) ?></h5>
-                <p class="text-white-50 small mb-4">Total: <?= $i[3] ?> registros</p>
-            </a>
-            
-            <form class="toggle-form" method="POST">
-                <input type="hidden" name="tipo_registro" value="<?= $i[5] ?>">
-                <div class="d-flex align-items-center justify-content-between">
-                    <span class="status-badge <?= $i[4] ? 'bg-open' : 'bg-closed' ?>">
-                        <?= $i[4] ? 'ABIERTO' : 'CERRADO' ?>
-                    </span>
-                    <button type="submit" name="toggle" class="btn btn-sm <?= $i[4] ? 'btn-outline-danger' : 'btn-outline-success' ?>">
-                        <?= $i[4] ? 'Cerrar' : 'Abrir' ?>
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="dashboard-container">
+    <div class="header-section">
+        <h1>Servicios DEP</h1>
+        <p>Administración de módulos y estados del sistema.</p>
     </div>
-    <?php endforeach; ?>
+
+    <div class="list-modulos">
+        <?php foreach($modulos_finales as $m): ?>
+        <div class="isla-control shadow-sm">
+            <div class="info-principal">
+                <div class="icon-box"><?= $m['icon'] ?></div>
+                <div>
+                    <h5 class="titulo-modulo"><?= htmlspecialchars($m['label']) ?></h5>
+                    <div class="badge-pill"><?= $m['conteo'] ?> REGISTROS</div>
+                </div>
+            </div>
+
+            <div class="acciones">
+                <a href="<?= $m['url'] ?>" class="btn-gestionar">Gestionar</a>
+
+                <form class="toggle-form m-0" method="POST">
+                    <input type="hidden" name="tipo_registro" value="<?= $m['clave'] ?>">
+                    <div class="form-check form-switch d-flex align-items-center gap-2">
+                        <span class="status-text <?= $m['abierto'] ? 'text-open' : 'text-danger' ?>">
+                            <?= $m['abierto'] ? 'Activo' : 'Cerrado' ?>
+                        </span><hr><hr><hr><hr><hr>
+                        <input class="form-check-input" type="checkbox" role="switch" 
+                               onchange="actualizarEstado(this)"
+                               <?= $m['abierto'] ? 'checked' : '' ?>>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".toggle-form").forEach(form => {
-            form.addEventListener("submit", function(event) {
-                event.preventDefault(); // Previene la recarga de página por defecto
-                
-                const formData = new FormData(this);
-                formData.append('toggle', '1');
+    function actualizarEstado(checkbox) {
+        const form = checkbox.closest('form');
+        const formData = new FormData(form);
+        formData.append('toggle', '1');
+        const statusText = form.querySelector('.status-text');
 
-                const statusBadge = this.querySelector(".status-badge");
-                const button = this.querySelector("button");
-
-                fetch(window.location.href, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (data.nuevo_estado === '1') {
-                            statusBadge.className = "status-badge bg-open";
-                            statusBadge.textContent = "ABIERTO";
-                            button.className = "btn btn-sm btn-outline-danger";
-                            button.textContent = "Cerrar";
-                        } else {
-                            statusBadge.className = "status-badge bg-closed";
-                            statusBadge.textContent = "CERRADO";
-                            button.className = "btn btn-sm btn-outline-success";
-                            button.textContent = "Abrir";
-                        }
-                    }
-                })
-                .catch(error => console.error("Error al conectar con el servidor:", error));
-            });
+        fetch(window.location.href, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.nuevo_estado === '1') {
+                    statusText.textContent = "Activo";
+                    statusText.className = "status-text text-open";
+                } else {
+                    statusText.textContent = "Cerrado";
+                    statusText.className = "status-text text-danger";
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            checkbox.checked = !checkbox.checked;
         });
-    });
+    }
 </script>
-
-<?php 
-// Cerrar el <main> y el <div> (wrapper) que fueron abiertos en header.php
-?>
-</main>
-</div>
 </body>
 </html>

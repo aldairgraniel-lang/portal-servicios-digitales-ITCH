@@ -61,13 +61,14 @@
 
                 <form id="registroForm" action="guardar_preregistro.php" method="POST">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="reg-verano__label">Nombre(s)</label>
-                            <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan Carlos" pattern="([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+[\s]*)+" required>
-                        </div>
+                        
                         <div class="col-md-6 mb-3">
                             <label class="reg-verano__label">Apellido(s)</label>
                             <input type="text" name="apellidos" class="form-control" placeholder="Ej. Pérez" pattern="([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+[\s]*)+" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="reg-verano__label">Nombre(s)</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan Carlos" pattern="([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+[\s]*)+" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="reg-verano__label">Número de Control</label>

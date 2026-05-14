@@ -7,7 +7,7 @@ include(__DIR__ . "/../conexion.php");
 
 if (isset($_GET['id'])) {
     // Uso de sentencia preparada para seguridad
-    $stmt = $conexion->prepare("SELECT archivo_pdf, nombre_estudiante, numero_control FROM solicitudes_cartas_presentacion WHERE id = ? LIMIT 1");
+    $stmt = $conexion->prepare("SELECT archivo_pdf, nombre, numero_control FROM solicitudes_cartas_presentacion WHERE id = ? LIMIT 1");
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -19,7 +19,7 @@ if (isset($_GET['id'])) {
         if (!empty($nombreArchivo) && file_exists($rutaCompleta)) {
             
             $size = filesize($rutaCompleta);
-            $nombreLimpio = $row['numero_control'] . "_" . str_replace(' ', '_', $row['nombre_estudiante']) . ".pdf";
+            $nombreLimpio = $row['numero_control'] . "_" . str_replace(' ', '_', $row['nombre']) . ".pdf";
 
             // 2. Limpieza total de búferes
             while (ob_get_level()) {

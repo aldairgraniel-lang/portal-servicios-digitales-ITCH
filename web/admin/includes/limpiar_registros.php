@@ -7,6 +7,7 @@ $servicios_map = [
     'registro_ingles' => 'Constancias de Inglés',
     'solicitudes_cartas_presentacion' => 'Cartas de Presentación',
     'solicitudes_cartas_aceptacion' => 'Cartas de Aceptación',
+    'solicitudes_cartas_terminacion' => 'Cartas de Terminación',
     'justificantes' => 'Justificantes',
     'avisos' => 'Avisos'
 ];
