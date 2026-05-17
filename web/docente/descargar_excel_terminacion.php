@@ -69,13 +69,15 @@ echo "<thead>
 
 if ($resultado->num_rows > 0) {
     while ($row = $resultado->fetch_assoc()) {
+        // CAMBIO AQUÍ: Extraer únicamente la fecha omitiendo la hora (Formato Día/Mes/Año)
+        $fecha_sin_hora = date("d/m/Y", strtotime($row['fecha_registro']));
+
         echo "<tr>";
         echo "<td>" . $row['n_control'] . "</td>";
         echo "<td>" . mb_convert_encoding($row['nombre'], 'UTF-8') . "</td>";
-        // Se eliminó la celda de numero_celular
         echo "<td>" . $row['tipo_tramite'] . "</td>";
         echo "<td>" . $row['nombre_archivo_aceptacion'] . "</td>";
-        echo "<td>" . $row['fecha_registro'] . "</td>";
+        echo "<td>" . $fecha_sin_hora . "</td>"; // Imprime la fecha limpia sin hora
         echo "</tr>";
     }
 } else {
@@ -84,3 +86,4 @@ if ($resultado->num_rows > 0) {
 
 echo "</tbody></table>";
 exit;
+?>

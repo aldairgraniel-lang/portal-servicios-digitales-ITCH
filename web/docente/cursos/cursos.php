@@ -34,10 +34,29 @@ if ($edit_mode) {
 <div class="main-container p-4">
     
     <div class="registration-bar">
+        <div class="main-container p-4">
+    
+    <div class="registration-bar">
         <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h1 class="text-white m-0">Gestión de Cursos</h1>
             <a href="../panel_docente.php" class="btn btn-outline-primary">Regresar</a>
         </header>
+
+        <div class="rep-info-banner mb-4">
+            <ul class="text-white ps-3 mb-0 opacity-90" style="list-style-type: disc;">
+                <li class="mb-2">
+                    Aquí puedes registrar, editar o eliminar los cursos disponibles para los estudiantes.
+                </li>
+                <li>
+                    Recuerda que son los cursos a los que se podrán postular los estudiantes.
+                </li>
+            </ul>
+        </div>
+        
+        <hr class="border-secondary opacity-25">
+    </div>
+
+</div>
         
         <section>
             <form action="procesar_cursos.php?accion=<?= $edit_mode ? 'actualizar' : 'crear' ?>" method="POST">

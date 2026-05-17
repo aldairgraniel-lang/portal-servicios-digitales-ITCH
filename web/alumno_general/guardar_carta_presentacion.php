@@ -9,8 +9,10 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Función para alertas estéticas
-function mostrarAlerta($icon, $title, $text, $redir = null) {
+// Función para alertas estéticas (Actualizada para soportar el diseño personalizado de duplicados)
+function mostrarAlerta($icon, $title, $text, $redir = null, $iconColor = null, $btnText = 'Aceptar') {
+    $customIconColor = $iconColor ? "iconColor: '$iconColor'," : "";
+    
     echo "<!DOCTYPE html>
     <html lang='es'>
     <head>
@@ -18,19 +20,21 @@ function mostrarAlerta($icon, $title, $text, $redir = null) {
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
         <style>
             body { background-color: #0b0e14; font-family: 'Segoe UI', sans-serif; }
+            .swal2-confirm { border-radius: 6px !important; padding: 10px 24px !important; }
         </style>
     </head>
     <body>
         <script>
             Swal.fire({
                 icon: '$icon',
+                $customIconColor
                 title: '$title',
                 text: '$text',
                 timer: 5000,
                 background: '#121212',
                 color: '#ffffff',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar'
+                confirmButtonColor: '#2b7cd3',
+                confirmButtonText: '$btnText'
             }).then((result) => {";
     
     if ($redir !== null) {
@@ -55,6 +59,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nombre) || empty($n_control) || empty($tipo)) {
         mostrarAlerta('error', 'Campos incompletos', 'Por favor, llena todos los campos del formulario.');
     }
+
+    // =========================================================================
+    // NUEVO: CONTROL DE DUPLICADOS (Evita procesar archivos si ya existe)
+    // =========================================================================
+    $check_query = "SELECT numero_control FROM solicitudes_cartas_presentacion WHERE numero_control = ? LIMIT 1";
+    $stmt_check = $conexion->prepare($check_query);
+    
+    if ($stmt_check) {
+        $stmt_check->bind_param("s", $n_control);
+        $stmt_check->execute();
+        $stmt_check->store_result();
+        
+        if ($stmt_check->num_rows > 0) {
+            $stmt_check->close();
+            $conexion->close();
+            
+            // Llama a la alerta con el diseño exacto de tu imagen (Icono info azul y botón OK)
+            mostrarAlerta('info', 'Ya registrado', 'Este número de control ya cuenta con una solicitud activa.', null, '#3ea2f0', 'OK');
+        }
+        $stmt_check->close();
+    } else {
+        die("Error al verificar duplicados: " . $conexion->error);
+    }
+    // =========================================================================
 
     // 2. Lógica adaptativa para el archivo según el tipo de trámite
     $tipo_lower = strtolower($tipo);
@@ -102,5 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $stmt->close();
+    $conexion->close();
 }
 ?>

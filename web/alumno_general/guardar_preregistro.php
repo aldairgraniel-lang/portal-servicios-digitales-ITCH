@@ -3,16 +3,21 @@ include("conexion.php");
 
 $conexion->set_charset("utf8mb4");
 
-// Función de diseño para alertas
-function alertaSweet($titulo, $mensaje, $icono, $redirect = null, $isHtml = false) {
+// Función de diseño para alertas (Optimizada para personalizar el diseño tipo Info Azul)
+function alertaSweet($titulo, $mensaje, $icono, $redirect = null, $isHtml = false, $iconColor = null, $btnText = 'Aceptar', $btnColor = '#3085d6') {
     $field = $isHtml ? 'html' : 'text';
+    $customIconColor = $iconColor ? "iconColor: '$iconColor'," : "";
+    
     echo "
     <!DOCTYPE html>
     <html lang='es'>
     <head>
         <meta charset='UTF-8'>
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <style>body { background-color: #0b0e14; font-family: 'Segoe UI', sans-serif; }</style>
+        <style>
+            body { background-color: #0b0e14; font-family: 'Segoe UI', sans-serif; }
+            .swal2-confirm { border-radius: 6px !important; padding: 10px 24px !important; }
+        </style>
     </head>
     <body>
     <script>
@@ -20,11 +25,12 @@ function alertaSweet($titulo, $mensaje, $icono, $redirect = null, $isHtml = fals
             title: '$titulo',
             $field: '$mensaje',
             icon: '$icono',
+            $customIconColor
             timer: 5000,
             background: '#121212',
             color: '#ffffff',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '$btnColor',
+            confirmButtonText: '$btnText',
             allowOutsideClick: false
         }).then(() => {
             " . ($redirect ? "window.location.href = '$redirect';" : "window.history.back();") . "
@@ -59,8 +65,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         alertaSweet('Registro cerrado', 'El registro no está disponible en este momento.', 'warning', 'index.php');
     }
 
+    // =========================================================================
+    // NUEVO BLINDAJE: Evitar inscripción duplicada en el MISMO curso
+    // =========================================================================
+    $dup_check = $conexion->prepare("SELECT COUNT(*) as ya_inscrito FROM VERANO WHERE numero_control = ? AND curso_interes = ?");
+    $dup_check->bind_param("ss", $numero_control, $curso);
+    $dup_check->execute();
+    $ya_inscrito = $dup_check->get_result()->fetch_assoc()['ya_inscrito'];
+
+    if ($ya_inscrito > 0) {
+        $dup_check->close();
+        $conexion->close();
+        // Llama a la alerta con la estética idéntica a tu imagen informativa azul
+        alertaSweet('Ya registrado', 'Este número de control ya cuenta con una solicitud activa para este curso.', 'info', null, false, '#3ea2f0', 'OK', '#2b7cd3');
+    }
+    $dup_check->close();
+    // =========================================================================
+
     // ============================
-    // Límite de 2 registros por alumno
+    // Límite de 2 registros por alumno en total
     // ============================
     $check = $conexion->prepare("SELECT COUNT(*) as total FROM VERANO WHERE numero_control = ?");
     $check->bind_param("s", $numero_control);
@@ -68,8 +91,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $total = $check->get_result()->fetch_assoc()['total'];
 
     if ($total >= 2) {
-        alertaSweet('Límite alcanzado', 'Ya tienes 2 registros. No puedes registrarte en más cursos.', 'warning');
+        $check->close();
+        $conexion->close();
+        alertaSweet('Límite alcanzado', 'Ya tienes 2 registros en total. No puedes registrarte en más cursos.', 'warning');
     }
+    $check->close();
 
     // ============================
     // Validación de campos
@@ -108,5 +134,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         alertaSweet('Error', 'No se pudo guardar el registro. Intenta de nuevo.', 'error');
     }
+
+    $stmt->close();
+    $conexion->close();
 }
 ?>

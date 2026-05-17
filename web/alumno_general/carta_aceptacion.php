@@ -106,4 +106,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include('../includes/footer.php'); // Opcional, dependiendo de tu estructura ?>
+<?php // Opcional, dependiendo de tu estructura ?>

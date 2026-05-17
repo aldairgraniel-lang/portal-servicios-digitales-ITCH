@@ -23,7 +23,7 @@ $justificantes_abierto = ($estado_justificantes === '1');
 // Definición de colores base para los botones
 $color_primario_abierto = '#04336c'; // Color para servicios habilitados
 $color_aviso_abierto = '#ff7b00'; // Color de advertencia o avisos
-$color_cerrado = '#6c757d'; // Color gris para indicar servicio inactivo
+$color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
 ?>
 <!DOCTYPE html>
 <html lang="es">

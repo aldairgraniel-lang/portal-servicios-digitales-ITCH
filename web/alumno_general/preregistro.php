@@ -35,7 +35,7 @@
     <div class="reg-verano__wrapper">
         <header class="reg-verano__hero">
             <div class="container">
-                <h1 class="reg-verano__title">Preregistro Verano</h1>
+                <h1 class="reg-verano__title">Preregistro verano</h1>
                 <p class="reg-verano__subtitle">Sigue las instrucciones para un registro exitoso.</p>
                 <p class="reg-verano__note">Es un preregistro no es definitivo se utilizara para avanzar grupos  o cursos que se ofertaran.</p>
             </div>
@@ -47,10 +47,12 @@
                     <div class="reg-verano__instruction-text">
                         <h5 class="fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>Pasos Importantes</h5>
                         <ul class="reg-verano__list">
+                            <strong>Recomendación:</strong> si ya estan registrados tus representantes continua tu registro.<br>
                             <strong>Nota importante:</strong> iniciar con apellidos, luego nombres y mayúsculas.<br>
                             <li><strong>Líderes:</strong> Regístrate primero como representante en el botón azul.</li>
                             <li><strong>Contacto:</strong> Celular a 10 dígitos.</li>
                             <li><strong>Verificación:</strong> Revisa todo antes de enviar sin espacios de mas.</li>
+                            <li><strong>Finalización:</strong> puedes registrarte en un maximo de 2 cursos mismo proceso.</li>
                         </ul>
                     </div>
                     <div class="text-center reg-verano__btn-wrapper">

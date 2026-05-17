@@ -10,12 +10,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipo_tramite   = $_POST['tipo_tramite'] ?? '';
     $nombre_archivo = trim($_POST['nombre_archivo_aceptacion']);
 
-    // 2. Validación básica de seguridad (Sin celular)
+    // 2. Validación básica de seguridad
     if (empty($nombre) || empty($n_control) || empty($tipo_tramite)) {
         die("Error: Faltan datos obligatorios.");
     }
 
-    // 3. BLINDAJE: Preparar la consulta SQL con 4 parámetros
+    // =========================================================================
+    // 3. CONTROL DE DUPLICADOS: Verificar si el número de control ya existe
+    // =========================================================================
+    $check_query = "SELECT n_control FROM solicitudes_cartas_terminacion WHERE n_control = ? LIMIT 1";
+    $stmt_check = $conexion->prepare($check_query);
+    
+    if ($stmt_check) {
+        $stmt_check->bind_param("s", $n_control);
+        $stmt_check->execute();
+        $stmt_check->store_result();
+        
+        // Si el número de filas es mayor a 0, el alumno ya está registrado
+        if ($stmt_check->num_rows > 0) {
+            $stmt_check->close();
+            $conexion->close();
+            
+            // Alerta de registro duplicado con diseño idéntico al de la imagen
+            echo "
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+            <style>
+                body { background-color: #0b0e14; font-family: sans-serif; }
+                .swal2-confirm { border-radius: 6px !important; padding: 10px 24px !important; }
+            </style>
+            <script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: 'Ya registrado',
+                        text: 'Este número de control ya cuenta con una solicitud activa.',
+                        icon: 'info',
+                        iconColor: '#3ea2f0',
+                        background: '#121212',
+                        color: '#ffffff',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#2b7cd3'
+                    }).then(() => {
+                        window.history.back();
+                    });
+                }
+            </script>";
+            exit(); // Detiene por completo la ejecución para evitar el INSERT
+        }
+        $stmt_check->close();
+    } else {
+        die("Error al preparar la verificación de duplicados: " . $conexion->error);
+    }
+    // =========================================================================
+
+
+    // 4. BLINDAJE DE INSERCIÓN: Preparar la consulta SQL con 4 parámetros
     $query = "INSERT INTO solicitudes_cartas_terminacion (nombre, n_control, tipo_tramite, nombre_archivo_aceptacion) 
               VALUES (?, ?, ?, ?)";
     
@@ -46,14 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             </script>";
         } else {
-            // RESPUESTA DE ERROR (Por si el número de control ya existe o falla la BD)
+            // RESPUESTA DE ERROR (Falla general en la base de datos)
             echo "
             <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
             <script>
                 window.onload = function() {
                     Swal.fire({
                         title: 'Hubo un problema',
-                        text: 'No se pudo registrar: " . addslashes($stmt->error) . "',
+                        text: 'No se pudo registrar en el sistema: " . addslashes($stmt->error) . "',
                         icon: 'error',
                         confirmButtonColor: '#1B396A'
                     }).then(() => {
@@ -63,13 +111,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </script>";
         }
         $stmt->close();
+    } else {
+        die("Error al preparar la consulta de inserción: " . $conexion->error);
     }
 
-    // Cerrar la conexión
+    // Cerrar la conexión principal
     $conexion->close();
 
 } else {
-    // Si intentan entrar por URL directa, redirigir al formulario
+    // Si intentan entrar de forma directa por URL, redirigir al formulario original
     header("Location: carta_terminacion.php");
     exit();
 }

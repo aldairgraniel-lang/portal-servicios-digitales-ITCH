@@ -184,7 +184,7 @@ foreach ($config_modulos as $m) {
 
 <div class="dashboard-container">
     <div class="header-section">
-        <h1>Servicios DEP</h1>
+        <h1>Servicios DEP</h1><strong> Division de Estudios Profesionales. </strong>
         <p>Administración de módulos y estados del sistema.</p>
     </div>
 
