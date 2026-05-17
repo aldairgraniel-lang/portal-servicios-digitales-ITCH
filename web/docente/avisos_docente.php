@@ -168,7 +168,7 @@ if ($vista === 'lista') {
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="../img/imagen1.png" type="image/x-icon">
-    <title>ITCH - Gestión de Avisos</title>
+    <title>ITCH - Panel Avisos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -187,7 +187,7 @@ if ($vista === 'lista') {
                     <div class="card-body p-4 p-md-5">
                         <header class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
                             <div>
-                                <h4 class="fw-bold text-light mb-0">📢 COMUNICAR AVISOS</h4>
+                                <h4 class="fw-bold text-light mb-0">🔊 COMUNICAR AVISOS</h4>
                                 <p class="text-secondary small mt-1 mb-0" style="letter-spacing: 0.3px;">
                                     Administra los avisos para la comunidad educativa. Crea mensajes importantes y mantén a todos informados.
                                 </p>

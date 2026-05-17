@@ -121,7 +121,7 @@ $cursos = $conexion->query("SELECT DISTINCT curso_interes FROM VERANO ORDER BY c
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
                 <button type="button" 
-                        onclick="<?= ($result && $result->num_rows > 0) ? "window.location.href='exportarECXEL.php?".http_build_query($_GET)."'" : "alertaNoDatos()" ?>" 
+                        onclick="<?= ($result && $result->num_rows > 0) ? "window.location.href='exportar_excel_preregistro.php?".http_build_query($_GET)."'" : "alertaNoDatos()" ?>" 
                         class="btn btn-success fw-bold" title="Exportar a Excel">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>
