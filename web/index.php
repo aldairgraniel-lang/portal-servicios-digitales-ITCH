@@ -12,6 +12,8 @@ $estado_presentacion = $conexion->query("SELECT valor FROM configuracion WHERE c
 $estado_aceptacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_aceptacion_abierto'")->fetch_assoc()['valor'] ?? '0';
 $estado_terminacion = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_terminacion_abierto'")->fetch_assoc()['valor'] ?? '0';
 $estado_justificantes = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_justificantes_abierto'")->fetch_assoc()['valor'] ?? '0';
+$estado_buena_conducta = $conexion->query("SELECT valor FROM configuracion WHERE clave = 'registro_buena_conducta_abierto'")->fetch_assoc()['valor'] ?? '0';
+
 // Asigna variables booleanas a cada estado para evaluar su disponibilidad
 $verano_abierto = ($estado_verano === '1');
 $ingles_abierto = ($estado_ingles === '1');
@@ -19,6 +21,7 @@ $presentacion_abierto = ($estado_presentacion === '1');
 $aceptacion_abierto = ($estado_aceptacion === '1');
 $terminacion_abierto = ($estado_terminacion === '1');
 $justificantes_abierto = ($estado_justificantes === '1');
+$buena_conducta_abierto = ($estado_buena_conducta === '1');
 
 // Definición de colores base para los botones
 $color_primario_abierto = '#04336c'; // Color para servicios habilitados
@@ -32,7 +35,6 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
     <link rel="icon" href="img/imagen1.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ITCH - Portal de Servicios</title>
-    <script src="[https://cdn.jsdelivr.net/npm/sweetalert2@11](https://cdn.jsdelivr.net/npm/sweetalert2@11)"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -79,34 +81,46 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
                 </a>
             </div>
 
+            <!-- BOTÓN DE CARTA DE ACEPTACIÓN CON ALERTA DE ALUMNO INTERNO -->
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="<?= $aceptacion_abierto ? 'alumno_general/carta_aceptacion.php' : 'javascript:void(0);'; ?>" 
-                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
-                   style="background-color: <?= $aceptacion_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$aceptacion_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
-                   title="<?= !$aceptacion_abierto ? 'Servicio Cerrado' : ''; ?>">
-                    <span>CARTA DE ACEPTACIÓN.</span>
-                </a>
+                <?php if ($aceptacion_abierto): ?>
+                    <!-- BOTÓN ACTIVO CON ALERTA -->
+                    <a href="javascript:void(0);" 
+                       onclick="confirmarInternoAceptacion()"
+                       class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                       style="background-color: <?= $color_primario_abierto ?>;">
+                        <span>CARTA DE ACEPTACIÓN.</span>
+                    </a>
+                <?php else: ?>
+                    <!-- BOTÓN DESHABILITADO -->
+                    <a href="javascript:void(0);" 
+                       class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                       style="background-color: <?= $color_cerrado ?>; cursor: not-allowed; opacity: 0.7;"
+                       title="Servicio Cerrado">
+                        <span>CARTA DE ACEPTACIÓN.</span>
+                    </a>
+                <?php endif; ?>
             </div>
 
-<div class="col-12 col-md-6 col-lg-4">
-    <?php if ($terminacion_abierto): ?> <!-- CAMBIADO AQUÍ -->
-        <!-- BOTÓN ACTIVO CON ALERTA -->
-        <a href="javascript:void(0);" 
-           onclick="confirmarInterno()"
-           class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
-           style="background-color: <?= $color_primario_abierto ?>;">
-            <span>CARTA DE TERMINACIÓN.</span>
-        </a>
-    <?php else: ?>
-        <!-- BOTÓN DESHABILITADO -->
-        <a href="javascript:void(0);" 
-           class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
-           style="background-color: <?= $color_cerrado ?>; cursor: not-allowed; opacity: 0.7;"
-           title="Servicio Cerrado">
-            <span>CARTA DE TERMINACIÓN.</span>
-        </a>
-    <?php endif; ?>
-</div>          
+            <div class="col-12 col-md-6 col-lg-4">
+                <?php if ($terminacion_abierto): ?> 
+                    <!-- BOTÓN ACTIVO CON ALERTA -->
+                    <a href="javascript:void(0);" 
+                       onclick="confirmarInterno()"
+                       class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                       style="background-color: <?= $color_primario_abierto ?>;">
+                        <span>CARTA DE TERMINACIÓN.</span>
+                    </a>
+                <?php else: ?>
+                    <!-- BOTÓN DESHABILITADO -->
+                    <a href="javascript:void(0);" 
+                       class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                       style="background-color: <?= $color_cerrado ?>; cursor: not-allowed; opacity: 0.7;"
+                       title="Servicio Cerrado">
+                        <span>CARTA DE TERMINACIÓN.</span>
+                    </a>
+                <?php endif; ?>
+            </div>          
 
             <div class="col-12 col-md-6 col-lg-4">
                 <a href="<?= $justificantes_abierto ? 'alumno_general/justificante.php' : 'javascript:void(0);'; ?>" 
@@ -114,6 +128,16 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
                    style="background-color: <?= $justificantes_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$justificantes_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
                    title="<?= !$justificantes_abierto ? 'Servicio Cerrado' : ''; ?>">
                     <span>JUSTIFICANTE.</span>
+                </a>
+            </div>
+
+            <!-- NUEVO BOTÓN: CARTA DE BUENA CONDUCTA -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="<?= $buena_conducta_abierto ? 'alumno_general/carta_buena_conducta.php' : 'javascript:void(0);'; ?>" 
+                   class="btn btn-lg boton-servicio w-100 d-flex align-items-center justify-content-center" 
+                   style="background-color: <?= $buena_conducta_abierto ? $color_primario_abierto : $color_cerrado; ?>; <?= !$buena_conducta_abierto ? 'cursor: not-allowed; opacity: 0.7;' : ''; ?>"
+                   title="<?= !$buena_conducta_abierto ? 'Servicio Cerrado' : ''; ?>">
+                    <span>CARTA DE BUENA CONDUCTA.</span>
                 </a>
             </div>
 
@@ -180,7 +204,6 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
     function mostrarServicios() {   
         Swal.fire({
             background: '#0080ff',
-            
             title: '<h3 style="color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 10px;">Guía de Trámites</h3>',
             html: `
                 <div style="text-align: left; padding: 10px; background-color: #ffffff00; border-radius: 8px;">
@@ -188,12 +211,11 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
                         A continuación se describen los trámites disponibles en el portal:
                     </p>
                     <div style="display: grid; gap: 15px; ">
-                    <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
+                        <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-bullhorn"></i> Avisos Generales</div>
                             <div style="font-size: 0.8rem; color: #555;">Consulta comunicados importantes del departamento.</div>
                         </div>
                     
-                    <div style="display: grid; gap: 15px; ">
                         <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-edit"></i> Prerregistro Verano</div>
                             <div style="font-size: 0.8rem; color: #555;">Pre-regístrate a los cursos de verano disponibles para regularización o adelantamiento.</div>
@@ -210,8 +232,8 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
                         </div>
                         
                         <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
-                            <div style="font-weight: bold; color: #00264d;"><i class="fas fa-language"></i> cartas de terminacion</div>
-                            <div style="font-size: 0.8rem; color: #555;">Solicita tu carta de terminacion solo si eres.</div>
+                            <div style="font-weight: bold; color: #00264d;"><i class="fas fa-file-contract"></i> Cartas de Terminación</div>
+                            <div style="font-size: 0.8rem; color: #555;">Solicita tu carta de terminación si realizaste tu trámite como estudiante interno.</div>
                         </div>
 
                         <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
@@ -222,6 +244,11 @@ $color_cerrado = '#7d6c6c'; // Color gris para indicar servicio inactivo
                         <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
                             <div style="font-weight: bold; color: #00264d;"><i class="fas fa-calendar-times"></i> Justificante</div>
                             <div style="font-size: 0.8rem; color: #555;">Reporta tus inasistencias por motivos médicos, escolares o personales justificados.</div>
+                        </div>
+
+                        <div style="color: #333; display: block; padding: 12px; background: #e8f1fa; border-radius: 8px; border-left: 4px solid #ff7b00;">
+                            <div style="font-weight: bold; color: #00264d;"><i class="fas fa-user-check"></i> Carta de Buena Conducta</div>
+                            <div style="font-size: 0.8rem; color: #555;">Solicita tu constancia oficial de buena conducta emitida por la institución.</div>
                         </div>
                     </div>
                 </div>
@@ -243,7 +270,6 @@ function confirmarInterno() {
         title: '<strong>Confirmación de Acceso</strong>',
         icon: 'info',
         html: `
-        
             <div style="text-align: center;">
                 <p>Este registro es <b>exclusivamente</b> para alumnos del instituto que realizaron su trámite como <b>estudiantes INTERNOS</b>.</p>
                 <hr>
@@ -254,13 +280,37 @@ function confirmarInterno() {
         focusConfirm: false,
         confirmButtonText: '<i class="bi bi-check-lg"></i> Sí, soy interno',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#1B396A', // Azul institucional
+        confirmButtonColor: '#1B396A', 
         cancelButtonColor: '#d33',
-        heightAuto: false, // Evita saltos visuales
+        heightAuto: false, 
     }).then((result) => {
         if (result.isConfirmed) {
-            // Redirige al formulario si confirma
             window.location.href = 'alumno_general/carta_terminacion.php';
+        }
+    });
+}
+
+function confirmarInternoAceptacion() {
+    Swal.fire({
+        title: '<strong>Confirmación de Acceso</strong>',
+        icon: 'info',
+        html: `
+            <div style="text-align: center;">
+                <p>Este registro es <b>exclusivamente</b> para alumnos del instituto que realizaron su trámite como <b>estudiantes INTERNOS</b>.</p>
+                <hr>
+                <p class="small text-muted">¿Deseas continuar con el registro?</p>
+            </div>
+        `,
+        showCancelButton: true,
+        focusConfirm: false,
+        confirmButtonText: '<i class="bi bi-check-lg"></i> Sí, soy interno',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#1B396A', 
+        cancelButtonColor: '#d33',
+        heightAuto: false, 
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'alumno_general/carta_aceptacion.php';
         }
     });
 }

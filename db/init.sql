@@ -22,7 +22,8 @@ INSERT IGNORE INTO configuracion (clave, valor) VALUES
 ('registro_presentacion_abierto', '0'),
 ('registro_aceptacion_abierto', '0'),
 ('registro_terminacion_abierto', '0'),
-('registro_justificantes_abierto', '0');
+('registro_justificantes_abierto', '0'),
+('registro_buena_conducta_abierto', '0') ;
 
 -- =========================
 -- REPRESENTANTES
@@ -188,8 +189,14 @@ CREATE TABLE IF NOT EXISTS solicitudes_cartas_presentacion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     numero_control VARCHAR(20) NOT NULL,
-    tipo_tramite VARCHAR(100) NOT NULL,
-    archivo_pdf VARCHAR(255) NOT NULL,
+    dirigido_a VARCHAR(255) NOT NULL,
+    docente_asesor VARCHAR(255) NOT NULL, -- <-- NUEVA COLUMNA AGREGADA
+    objetivo TEXT NOT NULL,                -- <-- NUEVA COLUMNA AGREGADA (Usa TEXT por la longitud del texto)
+    materia VARCHAR(255) NOT NULL,
+    semestre INT NOT NULL,
+    periodo VARCHAR(100) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_final DATE NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -226,3 +233,12 @@ CREATE TABLE IF NOT EXISTS justificantes (
     archivo_ruta VARCHAR(255) NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS solicitudes_cartas_buena_conducta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(255) NOT NULL,
+    numero_control VARCHAR(8) NOT NULL,
+    carrera VARCHAR(150) NOT NULL,
+    fecha_solicitud DATE NOT NULL,
+    INDEX idx_num_control (numero_control)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;

@@ -23,8 +23,8 @@ if ($estado_buena_conducta !== '1') {
     exit;
 }
 
-// Consultar las carreras directamente de la base de datos
-$query_carreras = $conexion->query("SELECT id, nombre_carrera FROM carreras ORDER BY nombre_carrera ASC");
+// Consultar las carreras ordenadas por ID
+$query_carreras = $conexion->query("SELECT id, nombre FROM carreras ORDER BY id ASC");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -37,7 +37,11 @@ $query_carreras = $conexion->query("SELECT id, nombre_carrera FROM carreras ORDE
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../css/index.css">
     <style>
-        /* Réplica exacta del diseño de la imagen */
+        body {
+            background-color: #f4f6f9;
+            color: #333333;
+        }
+        /* Réplica exacta del diseño de la tarjeta */
         .card-registro-exacto {
             background-color: #ffffff;
             border-radius: 15px;
@@ -67,7 +71,7 @@ $query_carreras = $conexion->query("SELECT id, nombre_carrera FROM carreras ORDE
             padding: 0.6rem 0.75rem;
             color: #495057;
         }
-        /* Botón institucional con efecto hover en Gold */
+        /* Botón institucional con el ligero salto y sombra al pasar el cursor */
         .btn-enviar-exacto {
             background-color: #1B396A;
             color: #ffffff;
@@ -76,11 +80,19 @@ $query_carreras = $conexion->query("SELECT id, nombre_carrera FROM carreras ORDE
             border-radius: 8px;
             padding: 0.75rem;
             width: 100%;
-            transition: background-color 0.3s ease, cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra base */
+            transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
         .btn-enviar-exacto:hover {
-            background-color: #9D843E; /* Se pone gold con el cursor sobre él */
+            background-color: #9D843E; /* Se pone gold */
             color: #ffffff;
+            transform: translateY(-2px); /* El ligero salto hacia arriba */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra más profunda */
+        }
+        .btn-enviar-exacto:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -138,15 +150,15 @@ $query_carreras = $conexion->query("SELECT id, nombre_carrera FROM carreras ORDE
                             <select name="carrera_alumno" id="carrera_alumno" class="form-select" required>
                                 <option value="" disabled selected>Seleccione una opción...</option>
                                 <?php while($row_carrera = $query_carreras->fetch_assoc()): ?>
-                                    <option value="<?php echo htmlspecialchars($row_carrera['nombre_carrera']); ?>">
-                                        <?php echo htmlspecialchars($row_carrera['nombre_carrera']); ?>
+                                    <option value="<?php echo htmlspecialchars($row_carrera['nombre']); ?>">
+                                        <?php echo htmlspecialchars($row_carrera['nombre']); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Botón de Envío Interactivo (Azul -> Gold al pasar cursor) -->
+                    <!-- Botón de Envío Interactivo -->
                     <div class="mb-3">
                         <button type="submit" class="btn-enviar-exacto">Finalizar y Enviar</button>
                     </div>

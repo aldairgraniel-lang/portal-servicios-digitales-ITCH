@@ -10,6 +10,7 @@ $servicios_map = [
     'solicitudes_cartas_presentacion' => 'solicitudes de cartas de presentación',
     'solicitudes_cartas_aceptacion' => 'Solicitudes de Cartas de Aceptación',
     'solicitudes_cartas_terminacion' => 'Solicitudes de Cartas de Terminación',
+    'solicitudes_cartas_buena_conducta' => 'Solicitudes de Cartas de Buena Conducta', // <-- Agregado para la limpieza masiva
     'justificantes' => 'solicitudes de justificantes',
     'avisos' => 'Avisos'
 ];
@@ -37,6 +38,7 @@ $datos = [
         ["Solicitudes - cartas de presentacion", get_count($conexion, "solicitudes_cartas_presentacion"), "solicitudes/solicitudes_cartas_presentacion.php"],
         ["Solicitudes - cartas de aceptación", get_count($conexion, "solicitudes_cartas_aceptacion"), "solicitudes/solicitudes_cartas_aceptacion.php"],
         ["Solicitudes - cartas de terminación", get_count($conexion, "solicitudes_cartas_terminacion"), "solicitudes/solicitudes_cartas_terminacion.php"],
+        ["Solicitudes - cartas de buena conducta", get_count($conexion, "solicitudes_cartas_buena_conducta"), "solicitudes/buena_conducta.php"], // <-- Nueva tarjeta agregada
         ["Solicitudes - justificantes", get_count($conexion, "justificantes"), "solicitudes/justificantes.php"]
     ]
 ];

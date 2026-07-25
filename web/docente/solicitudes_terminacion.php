@@ -161,9 +161,8 @@ if ($busqueda_solicitada) {
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5">
-                                <i class="bi bi-folder-x fs-1 d-block mb-2 text-warning"></i>
-                                <span class="text-warning">No se encontraron registros con los filtros seleccionados.</span>
+                            <td colspan="5" class="text-center p-5 text-warning">
+                                <i class="bi bi-folder-x fs-2 d-block mb-2 text-warning"></i> No se encontraron registros.
                             </td>
                         </tr>
                     <?php endif; ?>

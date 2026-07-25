@@ -9,7 +9,7 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Función para alertas estéticas (Actualizada para soportar el diseño personalizado de duplicados)
+// Función para alertas estéticas (SweetAlert2)
 function mostrarAlerta($icon, $title, $text, $redir = null, $iconColor = null, $btnText = 'Aceptar') {
     $customIconColor = $iconColor ? "iconColor: '$iconColor'," : "";
     
@@ -51,17 +51,25 @@ function mostrarAlerta($icon, $title, $text, $redir = null, $iconColor = null, $
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Nombres ajustados según tu formulario HTML
-    $nombre = trim($_POST['nombre'] ?? '');
-    $n_control = trim($_POST['n_control'] ?? '');
-    $tipo = trim($_POST['tipo_tramite'] ?? '');
+    // 1. Captura y limpieza de datos según el nuevo formulario
+    $nombre         = trim($_POST['nombre'] ?? '');
+    $n_control      = trim($_POST['n_control'] ?? '');
+    $dirigido_a     = trim($_POST['dirigido_a'] ?? '');
+    $docente_asesor = trim($_POST['docente_asesor'] ?? ''); // <--- CAPTURA DOCENTE / ASESOR
+    $objetivo       = trim($_POST['objetivo'] ?? '');       // <--- CAPTURA OBJETIVO
+    $materia        = trim($_POST['materia'] ?? '');
+    $semestre       = trim($_POST['semestre'] ?? '');
+    $periodo        = trim($_POST['periodo'] ?? '');
+    $fecha_inicio   = trim($_POST['fecha_inicio'] ?? '');
+    $fecha_final    = trim($_POST['fecha_final'] ?? '');
 
-    if (empty($nombre) || empty($n_control) || empty($tipo)) {
+    // Validación de campos obligatorios (se añaden los nuevos campos a la verificación)
+    if (empty($nombre) || empty($n_control) || empty($dirigido_a) || empty($docente_asesor) || empty($objetivo) || empty($materia) || empty($semestre) || empty($periodo) || empty($fecha_inicio) || empty($fecha_final)) {
         mostrarAlerta('error', 'Campos incompletos', 'Por favor, llena todos los campos del formulario.');
     }
 
     // =========================================================================
-    // NUEVO: CONTROL DE DUPLICADOS (Evita procesar archivos si ya existe)
+    // CONTROL DE DUPLICADOS
     // =========================================================================
     $check_query = "SELECT numero_control FROM solicitudes_cartas_presentacion WHERE numero_control = ? LIMIT 1";
     $stmt_check = $conexion->prepare($check_query);
@@ -75,7 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_check->close();
             $conexion->close();
             
-            // Llama a la alerta con el diseño exacto de tu imagen (Icono info azul y botón OK)
             mostrarAlerta('info', 'Ya registrado', 'Este número de control ya cuenta con una solicitud activa.', null, '#3ea2f0', 'OK');
         }
         $stmt_check->close();
@@ -84,44 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // =========================================================================
 
-    // 2. Lógica adaptativa para el archivo según el tipo de trámite
-    $tipo_lower = strtolower($tipo);
-    $requiere_archivo = ($tipo_lower === 'servicio social' || $tipo_lower === 'residencia profesional');
-    
-    $nombre_archivo_final = null; // Se inicializa como nulo
-
-    if ($requiere_archivo) {
-        if (isset($_FILES['documento_pdf']) && $_FILES['documento_pdf']['error'] === UPLOAD_ERR_OK) {
-            $archivo = $_FILES['documento_pdf'];
-            $tipo_archivo = $archivo['type'];
-
-            if ($tipo_archivo !== 'application/pdf') {
-                mostrarAlerta('error', 'Formato no válido', 'Solo se permiten archivos PDF.');
-            }
-
-            $directorio = "../uploads/cartas/";
-            if (!file_exists($directorio)) {
-                mkdir($directorio, 0755, true);
-            }
-
-            // Generamos el nombre del archivo
-            $nombre_archivo_final = $n_control . "_" . time() . ".pdf";
-            $ruta_destino = $directorio . $nombre_archivo_final;
-
-            if (!move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
-                mostrarAlerta('error', 'Error de guardado', 'No se pudo mover el archivo al servidor.');
-            }
-        } else {
-            mostrarAlerta('warning', 'Falta archivo', 'Por favor, adjunta tu documento en PDF.');
-        }
-    }
-
-    // 3. Insertar en la base de datos
+    // 2. Insertar en la base de datos incluyendo las nuevas columnas docente_asesor y objetivo
     $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_presentacion 
-        (nombre, numero_control, tipo_tramite, archivo_pdf) 
-        VALUES (?, ?, ?, ?)");
+        (nombre, numero_control, dirigido_a, docente_asesor, objetivo, materia, semestre, periodo, fecha_inicio, fecha_final) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    $stmt->bind_param("ssss", $nombre, $n_control, $tipo, $nombre_archivo_final);
+    // El parámetro cambia a "ssssssssss" (10 strings para las 10 columnas en total)
+    $stmt->bind_param("ssssssssss", $nombre, $n_control, $dirigido_a, $docente_asesor, $objetivo, $materia, $semestre, $periodo, $fecha_inicio, $fecha_final);
 
     if ($stmt->execute()) {
         mostrarAlerta('success', '¡Enviado!', 'Tu solicitud se ha registrado correctamente.', '/index.php');

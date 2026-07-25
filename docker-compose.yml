@@ -1,6 +1,5 @@
 version: '3.8' # Versión del formato del archivo Docker Compose
-environment:
-  - TZ=America/Cancun
+
 services:
   # Servicio del servidor web (PHP / Apache o Nginx)
   web:
@@ -10,6 +9,8 @@ services:
     volumes:
       - ./web:/var/www/html # Sincroniza la carpeta local de código con el directorio web del contenedor
       - ./php.ini:/usr/local/etc/php/php.ini # Sobrescribe la configuración de PHP con la local personalizada
+    environment:
+      - TZ=America/Cancun # <-- AHORA SÍ ESTÁ EN EL LUGAR CORRECTO (Dentro de web)
     depends_on:
       - db # Indica que este servicio debe esperar a que el contenedor de la base de datos esté listo
 

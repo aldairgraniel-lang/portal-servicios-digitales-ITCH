@@ -7,7 +7,7 @@ include(__DIR__ . "/../conexion.php");
 if (isset($_POST['toggle'])) {
     if (!isset($_POST['tipo_registro'])) exit('Solicitud inválida');
     $tipo = $_POST['tipo_registro'];
-    $permitidos = ['registro_abierto', 'registro_ingles_abierto', 'registro_presentacion_abierto', 'registro_aceptacion_abierto', 'registro_terminacion_abierto', 'registro_justificantes_abierto'];
+    $permitidos = ['registro_abierto', 'registro_ingles_abierto', 'registro_presentacion_abierto', 'registro_aceptacion_abierto', 'registro_terminacion_abierto', 'registro_justificantes_abierto', 'registro_buena_conducta_abierto'];
     if (!in_array($tipo, $permitidos)) exit('Acceso no permitido');
     $stmt = $conexion->prepare("SELECT valor FROM configuracion WHERE clave = ?");
     $stmt->bind_param("s", $tipo);
@@ -36,6 +36,7 @@ $config_modulos = [
     ['label' => 'Carta Aceptación', 'url' => 'solicitudes_aceptacion.php', 'icon' => '📄', 'clave' => 'registro_aceptacion_abierto', 'tabla' => 'solicitudes_cartas_aceptacion'],
     ['label' => 'Carta Terminación', 'url' => 'solicitudes_terminacion.php', 'icon' => '📄', 'clave' => 'registro_terminacion_abierto', 'tabla' => 'solicitudes_cartas_terminacion'],
     ['label' => 'Justificantes', 'url' => 'solicitudes_justificantes.php', 'icon' => '📝', 'clave' => 'registro_justificantes_abierto', 'tabla' => 'justificantes'],
+    ['label' => 'Carta Buena Conducta', 'url' => 'solicitudes_cartas_buena_conducta.php', 'icon' => '📄', 'clave' => 'registro_buena_conducta_abierto', 'tabla' => 'solicitudes_cartas_buena_conducta'],
 ];
 
 $modulos_finales = [];

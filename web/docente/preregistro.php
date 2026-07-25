@@ -4,14 +4,17 @@ include(__DIR__ . "/../conexion.php");
 include('includes/auth_docente.php');
 
 // =========================
-// FILTROS
+// FILTROS Y LIMPIEZA
 // =========================
-$filtro_nc     = $_GET['nc'] ?? ''; 
-$filtro_curso  = $_GET['curso'] ?? '';
-$fecha_inicio  = $_GET['fecha_inicio'] ?? '';
-$fecha_fin     = $_GET['fecha_fin'] ?? '';
+$filtro_nc     = isset($_GET['nc']) ? trim($_GET['nc']) : ''; 
+$filtro_curso  = isset($_GET['curso']) ? trim($_GET['curso']) : '';
+$fecha_inicio  = isset($_GET['fecha_inicio']) ? trim($_GET['fecha_inicio']) : '';
+$fecha_fin     = isset($_GET['fecha_fin']) ? trim($_GET['fecha_fin']) : '';
 
-// Detectar si el usuario ha intentado realizar una búsqueda
+// Detectar si el usuario presionó el botón de filtrar (existan o no datos en los inputs)
+$intento_filtrar = isset($_GET['nc']) || isset($_GET['curso']) || isset($_GET['fecha_inicio']) || isset($_GET['fecha_fin']);
+
+// Determinar con certeza si hay una búsqueda con criterios reales
 $busqueda_activa = ($filtro_nc !== '' || $filtro_curso !== '' || $fecha_inicio !== '' || $fecha_fin !== '');
 
 $params = [];
@@ -144,13 +147,15 @@ $cursos = $conexion->query("SELECT DISTINCT curso_interes FROM VERANO ORDER BY c
                     </tr>
                 </thead>
                 <tbody class="border-top-0">
-                    <?php if(!$busqueda_activa): ?>
+                    <?php if(!$intento_filtrar): ?>
+                        <!-- PRIMERA ENTRADA SIN ACCIÓN -->
                         <tr>
                             <td colspan="9" class="text-center p-5 text-light">
                                 <i class="bi bi-funnel fs-1 d-block mb-2 text-light"></i> Seleccione los filtros y presione "Filtrar" para ver los datos.
                             </td>
                         </tr>
-                    <?php elseif($result && $result->num_rows > 0): ?>
+                    <?php elseif($busqueda_activa && $result && $result->num_rows > 0): ?>
+                        <!-- ENCONTRÓ REGISTROS CON FILTROS VÁLIDOS -->
                         <?php while($row = $result->fetch_assoc()): ?>
                         <tr>
                             <td class="text-light"><?= htmlspecialchars($row['curso_interes']) ?></td>
@@ -165,9 +170,10 @@ $cursos = $conexion->query("SELECT DISTINCT curso_interes FROM VERANO ORDER BY c
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
+                        <!-- SE PRESIONÓ EL BOTÓN PERO NO HUBO FILTROS REALES O NO ENCONTRÓ NADA -->
                         <tr>
-                            <td colspan="9" class="text-center p-5 text-light">
-                                <i class="bi bi-folder-x fs-2 d-block mb-2"></i> No se encontraron registros con los criterios seleccionados.
+                            <td colspan="9" class="text-center p-5 text-warning">
+                                <i class="bi bi-folder-x fs-2 d-block mb-2 text-warning"></i> No se encontraron registros.
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -181,8 +187,8 @@ $cursos = $conexion->query("SELECT DISTINCT curso_interes FROM VERANO ORDER BY c
     function alertaNoDatos() {
         Swal.fire({
             icon: 'info',
-            title: 'Sin datos',
-            text: 'No hay registros disponibles para exportar. Realice una búsqueda primero.',
+            title: 'Atención',
+            text: 'No hay registros disponibles para exportar con los filtros seleccionados. Realice una búsqueda válida primero.',
             confirmButtonColor: '#198754',
             background: '#1e293b',
             color: '#fff'
