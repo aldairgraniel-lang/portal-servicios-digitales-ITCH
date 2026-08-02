@@ -5,7 +5,7 @@ services:
   web:
     build: . # Construye la imagen utilizando el Dockerfile del directorio actual
     ports:
-      - "8080:80" # Mapea el puerto 8080 de tu máquina local al puerto 80 del contenedor
+      - "0.0.0.0:8080:80" # Mapea el puerto 8080 de todas las interfaces de red al puerto 80 del contenedor
     volumes:
       - ./web:/var/www/html # Sincroniza la carpeta local de código con el directorio web del contenedor
       - ./php.ini:/usr/local/etc/php/php.ini # Sobrescribe la configuración de PHP con la local personalizada

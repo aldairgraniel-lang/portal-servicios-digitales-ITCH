@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 3. Validación en servidor
         if (empty($nombre) || empty($n_control)) {
             $mensaje_swal = "error";
-        } elseif (!ctype_digit($n_control) || strlen($n_control) !== 8) {
+        } elseif (!preg_match('/^[A-Za-z0-9]{8,10}$/', $n_control)) {
             $mensaje_swal = "error";
         } else {
             // 4. Verificar duplicados en la base de datos
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="input-group">
                                             <span class="input-group-text bg-dark border-0 text-white opacity-50"><i class="bi bi-hash"></i></span>
                                             <input type="text" name="numero_control" class="form-control rep-input" 
-                                                   placeholder="Ej. 19390015" required maxlength="8" pattern="[0-9]{8}">
+                                                   placeholder="Ej. 19390015" required maxlength="10" pattern="[A-Za-z0-9]{8,10}" title="Debe contener entre 8 y 10 caracteres (letras y números)">
                                         </div>
                                     </div>
 

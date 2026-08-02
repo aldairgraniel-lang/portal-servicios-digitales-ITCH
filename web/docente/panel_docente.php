@@ -36,7 +36,7 @@ $config_modulos = [
     ['label' => 'Carta Aceptación', 'url' => 'solicitudes_aceptacion.php', 'icon' => '📄', 'clave' => 'registro_aceptacion_abierto', 'tabla' => 'solicitudes_cartas_aceptacion'],
     ['label' => 'Carta Terminación', 'url' => 'solicitudes_terminacion.php', 'icon' => '📄', 'clave' => 'registro_terminacion_abierto', 'tabla' => 'solicitudes_cartas_terminacion'],
     ['label' => 'Justificantes', 'url' => 'solicitudes_justificantes.php', 'icon' => '📝', 'clave' => 'registro_justificantes_abierto', 'tabla' => 'justificantes'],
-    ['label' => 'Carta Buena Conducta', 'url' => 'solicitudes_cartas_buena_conducta.php', 'icon' => '📄', 'clave' => 'registro_buena_conducta_abierto', 'tabla' => 'solicitudes_cartas_buena_conducta'],
+    ['label' => 'Carta Buena Conducta', 'url' => 'solicitudes_buena_conducta.php', 'icon' => '📄', 'clave' => 'registro_buena_conducta_abierto', 'tabla' => 'solicitudes_cartas_buena_conducta'],
 ];
 
 $modulos_finales = [];

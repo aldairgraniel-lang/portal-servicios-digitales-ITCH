@@ -33,25 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 1. Recibir datos con seguridad
     $numero_control = trim($_POST['n_control'] ?? '');
     $tipo_tramite   = trim($_POST['tipo_tramite'] ?? '');
-    $archivo        = trim($_POST['nombre_archivo_previo'] ?? '');
 
     // 2. Validación de campos obligatorios básicos
     if (empty($numero_control) || empty($tipo_tramite)) {
         responder('error', 'Campos incompletos', 'Por favor, asegúrate de ingresar tu número de control y seleccionar un trámite.');
     }
 
-    // 3. Lógica condicional: Validar archivo solo si es necesario
-    $tramite_limpio = strtolower($tipo_tramite);
-    $necesita_archivo = ($tramite_limpio === "servicio social" || $tramite_limpio === "residencia profesional");
-
-    if ($necesita_archivo && empty($archivo)) {
-        responder('warning', 'Archivo requerido', 'Para este trámite, el nombre del archivo es obligatorio.');
-    }
-
-    // Si el trámite no requiere archivo, guardamos un valor por defecto o dejamos vacío
-    $archivo_final = $necesita_archivo ? $archivo : "NO APLICA";
-
-    // 4. Verificar duplicados (Seguridad)
+    // 3. Verificar duplicados (Seguridad)
     $stmt_check = $conexion->prepare("SELECT id FROM solicitudes_cartas_aceptacion WHERE numero_control = ?");
     $stmt_check->bind_param("s", $numero_control);
     $stmt_check->execute();
@@ -61,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt_check->close();
 
-    // 5. Inserción en Base de Datos
-    $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_aceptacion (numero_control, tipo_tramite, archivo_pdf) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $numero_control, $tipo_tramite, $archivo_final);
+    // 4. Inserción en Base de Datos
+    $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_aceptacion (numero_control, tipo_tramite) VALUES (?, ?)");
+    $stmt->bind_param("ss", $numero_control, $tipo_tramite);
 
     if ($stmt->execute()) {
         responder('success', '¡Registro Exitoso!', 'Tu solicitud se ha enviado correctamente.', '/index.php');

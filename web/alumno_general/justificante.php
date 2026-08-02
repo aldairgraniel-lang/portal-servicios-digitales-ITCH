@@ -52,7 +52,7 @@ $estado = isset($resultado['valor']) ? intval($resultado['valor']) : 0;
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="label-tecnm">NÚMERO DE CONTROL</label>
-                                <input type="text" name="n_control" class="form-control" placeholder="Ej. 19390015" required pattern="[0-9]{8,15}" maxlength="15">
+                                <input type="text" name="n_control" class="form-control" placeholder="Ej. A19390015" required pattern="[A-Za-z0-9]{8,10}" minlength="8" maxlength="10">
                             </div>
                         </div>
 

@@ -19,7 +19,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id_solicitud = $_GET['id'];
 
-// 2. CONSULTAR LA TABLA CORRECTA (solicitudes_cartas_presentacion)
+// 2. CONSULTAR LA TABLA CORRECTA
 $stmt = $conexion->prepare("SELECT * FROM solicitudes_cartas_presentacion WHERE id = ?");
 $stmt->bind_param("i", $id_solicitud);
 $stmt->execute();
@@ -66,36 +66,65 @@ $img5a    = imgToBase64('5a.png');
 <head>
 <meta charset="UTF-8">
 <style>
-    @page { margin: 150px 50px 140px 50px; }
-    body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000; }
+    /* MÁRGENES DE LA PÁGINA: Apertura de espacio superior para evitar encimados */
+    @page { 
+        margin: 140px 50px 110px 50px; 
+    }
+    
+    /* INTERLINEADO Y TIPOGRAFÍA INSTITUCIONAL */
+    body { 
+        font-family: 'Times New Roman', serif; 
+        font-size: 11pt; 
+        line-height: 1.35; 
+        color: #000; 
+    }
 
-    /* HEADER */
-    header { position: fixed; top: -130px; left: 0px; right: 0px; height: 110px; }
+    /* HEADER: Posicionamiento preciso sin colisión con metadata */
+    header { 
+        position: fixed; 
+        top: -115px; 
+        left: 0px; 
+        right: 0px; 
+        height: 100px; 
+    }
     .header-table { width: 100%; border-collapse: collapse; }
-    .logo-sep-redimensionado { width: 230px; height: auto; vertical-align: middle; } 
-    .logo-img2-redimensionado { width: 60px; height: auto; vertical-align: middle; margin-left: 10px; } 
-    .logo-mj-header-redimensionado { width: 90px; height: auto; }
-    .header-text-right { font-size: 8pt; text-align: right; line-height: 1.1; margin-top: 3px; }
+    .logo-sep-redimensionado { width: 220px; height: auto; vertical-align: middle; } 
+    .logo-img2-redimensionado { width: 55px; height: auto; vertical-align: middle; margin-left: 10px; } 
+    .logo-mj-header-redimensionado { width: 85px; height: auto; }
+    .header-text-right { font-size: 7.5pt; text-align: right; line-height: 1.1; margin-top: 3px; }
 
     /* FOOTER */
-    footer { position: fixed; bottom: -110px; left: 0px; right: 0px; height: 130px; }
+    footer { position: fixed; bottom: -95px; left: 0px; right: 0px; height: 110px; }
     .footer-table { width: 100%; border-collapse: collapse; }
-    .img-margarita { width: 135px; height: auto; }
-    .cert-block { text-align: right; margin-bottom: 5px; }
-    .logo-footer-small { height: 32px; width: auto; margin-left: 8px; vertical-align: middle; }
-    .black-line { border-top: 3.5px solid #333; width: 100%; margin-bottom: 5px; }
-    .footer-address { font-size: 7.2pt; text-align: left; line-height: 1.2; color: #000; }
+    .img-margarita { width: 120px; height: auto; }
+    .cert-block { text-align: right; margin-bottom: 3px; }
+    .logo-footer-small { height: 28px; width: auto; margin-left: 6px; vertical-align: middle; }
+    .black-line { border-top: 3px solid #333; width: 100%; margin-bottom: 3px; }
+    .footer-address { font-size: 7pt; text-align: left; line-height: 1.1; color: #000; }
 
-    /* CUERPO Y FIRMA */
-    .metadata { text-align: right; margin-bottom: 25px; font-size: 11pt; }
-    .recipient { margin-bottom: 25px; font-weight: bold; }
-    .body-text { text-align: justify; margin-bottom: 25px; }
-    .body-text p { margin-bottom: 15px; text-indent: 0px; }
-    .signature-section { text-align: left; margin-top: 35px; }
-    .slogan { font-size: 9pt; font-style: italic; margin: 0; }
-    .signature-line { width: 280px; border-top: 1px solid #000; margin: 45px 0 10px 0; }
-    .signature-name { font-weight: bold; margin-top: 5px; text-transform: uppercase; }
-    .initials { text-align: left; margin-top: 5px; font-size: 6pt; }
+    /* SECCIONES DEL CONTENIDO */
+    .metadata { 
+        text-align: right; 
+        margin-top: 10px; 
+        margin-bottom: 20px; 
+        font-size: 11pt; 
+    }
+    .metadata p { margin: 2px 0; }
+    
+    .recipient { margin-bottom: 20px; font-weight: bold; }
+    .recipient p { margin: 0; }
+    
+    .body-text { text-align: justify; margin-bottom: 15px; }
+    .body-text p { margin-bottom: 10px; text-indent: 0px; margin-top: 0; } 
+    
+    /* SECCIÓN DE FIRMA OPTIMIZADA */
+    .signature-section { text-align: left; margin-top: 25px; page-break-inside: avoid; }
+    .signature-section p { margin: 2px 0; }
+    .slogan { font-size: 8.5pt; font-style: italic; margin: 0; }
+    
+    .signature-line { width: 280px; border-top: 1px solid #000; margin: 35px 0 5px 0; }
+    .signature-name { font-weight: bold; margin-top: 3px; text-transform: uppercase; }
+    .initials { text-align: left; margin-top: 3px; font-size: 6pt; }
 </style>
 </head>
 <body>

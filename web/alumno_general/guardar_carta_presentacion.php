@@ -51,20 +51,20 @@ function mostrarAlerta($icon, $title, $text, $redir = null, $iconColor = null, $
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Captura y limpieza de datos según el nuevo formulario
+    // 1. Captura y limpieza de datos (Mapeados idénticos a los del Formulario HTML)
     $nombre         = trim($_POST['nombre'] ?? '');
-    $n_control      = trim($_POST['n_control'] ?? '');
+    $numero_control = trim($_POST['numero_control'] ?? ''); // <-- Corregido el nombre del POST
     $dirigido_a     = trim($_POST['dirigido_a'] ?? '');
-    $docente_asesor = trim($_POST['docente_asesor'] ?? ''); // <--- CAPTURA DOCENTE / ASESOR
-    $objetivo       = trim($_POST['objetivo'] ?? '');       // <--- CAPTURA OBJETIVO
+    $docente_asesor = trim($_POST['docente_asesor'] ?? '');
+    $objetivo       = trim($_POST['objetivo'] ?? '');
     $materia        = trim($_POST['materia'] ?? '');
     $semestre       = trim($_POST['semestre'] ?? '');
     $periodo        = trim($_POST['periodo'] ?? '');
     $fecha_inicio   = trim($_POST['fecha_inicio'] ?? '');
     $fecha_final    = trim($_POST['fecha_final'] ?? '');
 
-    // Validación de campos obligatorios (se añaden los nuevos campos a la verificación)
-    if (empty($nombre) || empty($n_control) || empty($dirigido_a) || empty($docente_asesor) || empty($objetivo) || empty($materia) || empty($semestre) || empty($periodo) || empty($fecha_inicio) || empty($fecha_final)) {
+    // Validación de campos obligatorios
+    if (empty($nombre) || empty($numero_control) || empty($dirigido_a) || empty($docente_asesor) || empty($objetivo) || empty($materia) || empty($semestre) || empty($periodo) || empty($fecha_inicio) || empty($fecha_final)) {
         mostrarAlerta('error', 'Campos incompletos', 'Por favor, llena todos los campos del formulario.');
     }
 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt_check = $conexion->prepare($check_query);
     
     if ($stmt_check) {
-        $stmt_check->bind_param("s", $n_control);
+        $stmt_check->bind_param("s", $numero_control);
         $stmt_check->execute();
         $stmt_check->store_result();
         
@@ -91,18 +91,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // =========================================================================
 
-    // 2. Insertar en la base de datos incluyendo las nuevas columnas docente_asesor y objetivo
+    // 2. Insertar en la base de datos
     $stmt = $conexion->prepare("INSERT INTO solicitudes_cartas_presentacion 
         (nombre, numero_control, dirigido_a, docente_asesor, objetivo, materia, semestre, periodo, fecha_inicio, fecha_final) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    // El parámetro cambia a "ssssssssss" (10 strings para las 10 columnas en total)
-    $stmt->bind_param("ssssssssss", $nombre, $n_control, $dirigido_a, $docente_asesor, $objetivo, $materia, $semestre, $periodo, $fecha_inicio, $fecha_final);
+    /**
+     * El parámetro de tipos cambia a "ssssssisss"
+     * nombre(s), numero_control(s), dirigido_a(s), docente_asesor(s), objetivo(s), materia(s), semestre(i), periodo(s), fecha_inicio(s), fecha_final(s)
+     */
+    $stmt->bind_param("ssssssisss", $nombre, $numero_control, $dirigido_a, $docente_asesor, $objetivo, $materia, $semestre, $periodo, $fecha_inicio, $fecha_final);
 
     if ($stmt->execute()) {
         mostrarAlerta('success', '¡Enviado!', 'Tu solicitud se ha registrado correctamente.', '/index.php');
     } else {
-        mostrarAlerta('error', 'Error de base de datos', 'No se pudo registrar en la base de datos.');
+        mostrarAlerta('error', 'Error de base de datos', 'No se pudo registrar en la base de datos: ' . $stmt->error);
     }
     
     $stmt->close();

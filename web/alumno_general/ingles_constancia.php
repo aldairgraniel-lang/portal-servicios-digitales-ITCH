@@ -48,13 +48,13 @@ $semestres_db = $conexion->query("SELECT numero FROM semestres ORDER BY numero A
                     <form action="guardar_ingles_constancia.php" method="POST">
                         <div class="mb-3">
                             <label class="label-tecnm">NOMBRE COMPLETO</label>
-                            <input type="text" name="nombre" class="form-control" placeholder="Ej: Pérez López Juan" pattern="([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+[\s]*)+" title="Cada nombre debe empezar con Mayúscula" required>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej: Pérez López Juan" title="Ingresa tu nombre completo" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="label-tecnm">NÚMERO DE CONTROL</label>
-                                <input type="text" name="numero_control" class="form-control" placeholder="19390015" required>
+                                <input type="text" name="numero_control" class="form-control" placeholder="19390015" pattern="[A-Za-z0-9]{8,10}" minlength="8" maxlength="10" title="Debe contener entre 8 y 10 caracteres (letras y números)" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="label-tecnm">PERIODO ACTUAL</label>

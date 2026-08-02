@@ -35,7 +35,7 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
 
                     <div class="indicaciones-alerta p-3 mb-4 shadow-sm">
                         <strong>Nota importante:</strong> iniciar con apellidos, luego nombres y mayúsculas.<br>
-                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> <strong>Formato:</strong> PRESENTACION_N_CONTROL.pdf 
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> <strong>Formato:</strong>  verificar antes de enviar  sus datos .<br> 
                     </div>
 
                     <form id="formCarta" action="guardar_carta_aceptacion.php" method="POST">
@@ -63,14 +63,14 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
                                 ?>
                             </select>
                         </div>
-
+                        <!--
                         <div class="mb-4">
                             <label class="label-tecnm">NOMBRE DEL ARCHIVO PDF</label>
-                            <!-- Se agrega ID y readonly para que sea automático y no editable -->
+                        
                             <input type="text" id="input_archivo" name="nombre_archivo_previo" class="form-control" placeholder="Esperando número de control..." required readonly>
                             <small class="text-muted">El nombre se genera automáticamente con su número de control.</small>
                         </div>
-
+                        -->
                         <button type="submit" class="btn-tecnm w-100">Finalizar y Enviar</button>
                         
                         <div class="text-center mt-4">

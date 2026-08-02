@@ -42,7 +42,7 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label class="label-tecnm">NÚMERO DE CONTROL</label>
-                                <input type="text" id="n_control" name="n_control" class="form-control" placeholder="8 dígitos" required pattern="[0-9]{8}" maxlength="8">
+                                <input type="text" id="n_control" name="n_control" class="form-control" placeholder="Ej. 19390015" required pattern="[A-Za-z0-9]{8,10}" minlength="8" maxlength="10">
                             </div>
                         </div>
 
@@ -55,11 +55,13 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
                             </select>
                         </div>
 
+                        <!--
                         <div class="mb-4">
                             <label class="label-tecnm">ARCHIVO DE ACEPTACIÓN ENTREGADO</label>
                             <input type="text" id="archivo_aceptacion" name="nombre_archivo_aceptacion" class="form-control" readonly style="background-color: #e9ecef;">
                             <small class="text-muted">Nombre generado automáticamente por el sistema.</small>
                         </div>
+                            -->
 
                         <button type="submit" class="btn-tecnm w-100">Finalizar y enviar</button>
                         <div class="text-center mt-4">
@@ -71,14 +73,18 @@ $resultado_tramites = mysqli_query($conexion, $query_tramites);
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Footer 
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 // Auto-completar nombre de archivo basado en el número de control
-document.getElementById('n_control').addEventListener('input', function(e) {
-    const nControl = e.target.value;
-    const inputArchivo = document.getElementById('archivo_aceptacion');
-    inputArchivo.value = nControl.length > 0 ? `ACEPTACION_${nControl}.pdf` : "";
-});
+const inputArchivo = document.getElementById('archivo_aceptacion');
+if (inputArchivo) {
+    document.getElementById('n_control').addEventListener('input', function(e) {
+        const nControl = e.target.value;
+        inputArchivo.value = nControl.length > 0 ? `ACEPTACION_${nControl}.pdf` : "";
+    });
+}
 </script>
+-->
+</body>

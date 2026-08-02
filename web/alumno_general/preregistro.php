@@ -74,7 +74,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="reg-verano__label">Número de Control</label>
-                            <input type="text" name="numero_control" class="form-control" required placeholder="Ej. 19390015" maxlength="8">
+                            <input type="text" name="numero_control" class="form-control" required placeholder="Ej. 19390015" maxlength="10" pattern="[A-Za-z0-9]{8,10}" title="Debe contener entre 8 y 10 caracteres (letras y números)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="reg-verano__label">Teléfono (WhatsApp)</label>
